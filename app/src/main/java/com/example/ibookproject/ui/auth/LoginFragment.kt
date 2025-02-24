@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.example.ibookproject.databinding.FragmentLoginBinding
+
 
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
@@ -18,9 +18,10 @@ class LoginFragment : Fragment() {
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
-        binding.root.setOnClickListener {
-            findNavController().navigate(com.example.ibookproject.R.id.action_loginFragment_to_dashboardFragment)
+        binding.loginButton.setOnClickListener {
+            // TODO: Add authentication logic
         }
+
 
         return binding.root
     }
