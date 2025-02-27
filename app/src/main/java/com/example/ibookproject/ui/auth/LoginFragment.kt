@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.ibookproject.databinding.FragmentLoginBinding
+import com.example.ibookproject.R
 
 
 class LoginFragment : Fragment() {
@@ -18,10 +20,15 @@ class LoginFragment : Fragment() {
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
+        // כפתור ה-Login (כרגע לא עושה כלום)
         binding.loginButton.setOnClickListener {
-            // TODO: Add authentication logic
+            // TODO: נכניס לוגיקת התחברות בהמשך
         }
 
+        // ניווט למסך ההרשמה
+        binding.goToRegisterText.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_registrationFragment)
+        }
 
         return binding.root
     }
