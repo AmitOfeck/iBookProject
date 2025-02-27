@@ -2,7 +2,17 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/profileCreationFragment">
+
+    <!-- Profile Creation Fragment (המסך הראשון) -->
+    <fragment
+        android:id="@+id/profileCreationFragment"
+        android:name="com.example.ibookproject.ui.profile.ProfileCreationFragment"
+        android:label="Profile Creation"
+        tools:layout="@layout/fragment_profile_creation">
+
+        <!-- נוכל להוסיף פעולות בהמשך -->
+    </fragment>
 
     <!-- Login Fragment -->
     <fragment
@@ -16,7 +26,7 @@
             android:id="@+id/action_loginFragment_to_registrationFragment"
             app:destination="@id/registrationFragment"/>
 
-        <!-- Navigate to Dashboard (כרגע לא פעיל) -->
+        <!-- Navigate to Dashboard -->
         <action
             android:id="@+id/action_loginFragment_to_dashboardFragment"
             app:destination="@id/dashboardFragment"/>
@@ -35,7 +45,7 @@
             app:destination="@id/loginFragment"/>
     </fragment>
 
-    <!-- Dashboard Fragment (בעתיד יהיה מסך הבית) -->
+    <!-- Dashboard Fragment -->
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="com.example.ibookproject.ui.dashboard.DashboardFragment"
