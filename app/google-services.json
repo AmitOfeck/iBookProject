@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "318124423084",
+    "project_id": "ibook-firebase-46532",
+    "storage_bucket": "ibook-firebase-46532.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:318124423084:android:b86ba5f90cc59d52bc2c09",
+        "android_client_info": {
+          "package_name": "com.example.ibookproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaIP9vGnMnmSqPKxvH9953oZtgupONEbc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
