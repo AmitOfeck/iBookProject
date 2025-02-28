@@ -26,7 +26,9 @@ class RegistrationFragment : Fragment() {
         binding.registerButton.setOnClickListener {
             val email = binding.emailInput.text?.toString()?.trim() ?: ""
             val password = binding.passwordInput.text?.toString()?.trim() ?: ""
+            val confirmPassword = binding.confirmPasswordInput.text?.toString()?.trim() ?: ""
 
+            // בדיקות תקינות
             if (!isValidEmail(email)) {
                 Toast.makeText(requireContext(), "כתובת אימייל לא תקינה", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -34,6 +36,11 @@ class RegistrationFragment : Fragment() {
 
             if (password.length < 6) {
                 Toast.makeText(requireContext(), "סיסמה חייבת להכיל לפחות 6 תווים", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (password != confirmPassword) {
+                Toast.makeText(requireContext(), "הסיסמאות אינן תואמות", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
