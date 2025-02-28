@@ -2,20 +2,50 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/registrationFragment">
 
+    <!-- Profile Creation Fragment (המסך הראשון) -->
+    <fragment
+        android:id="@+id/profileCreationFragment"
+        android:name="com.example.ibookproject.ui.profile.ProfileCreationFragment"
+        android:label="Profile Creation"
+        tools:layout="@layout/fragment_profile_creation">
+
+        <!-- נוכל להוסיף פעולות בהמשך -->
+    </fragment>
+
+    <!-- Login Fragment -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.ibookproject.ui.auth.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
 
-        <!-- Add this action -->
+        <!-- Navigate to Registration -->
+        <action
+            android:id="@+id/action_loginFragment_to_registrationFragment"
+            app:destination="@id/registrationFragment"/>
+
+        <!-- Navigate to Dashboard -->
         <action
             android:id="@+id/action_loginFragment_to_dashboardFragment"
             app:destination="@id/dashboardFragment"/>
     </fragment>
 
+    <!-- Registration Fragment -->
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="com.example.ibookproject.ui.auth.RegistrationFragment"
+        android:label="Registration"
+        tools:layout="@layout/fragment_registration">
+
+        <!-- Navigate back to Login -->
+        <action
+            android:id="@+id/action_registrationFragment_to_loginFragment"
+            app:destination="@id/loginFragment"/>
+    </fragment>
+
+    <!-- Dashboard Fragment -->
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="com.example.ibookproject.ui.dashboard.DashboardFragment"
