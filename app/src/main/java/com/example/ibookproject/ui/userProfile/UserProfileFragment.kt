@@ -1,11 +1,13 @@
 package com.example.ibookproject.ui.userProfile
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -60,16 +62,25 @@ class UserProfileFragment : Fragment() {
         // מאזינים ללחיצה על כפתורי הסטטיסטיקה
         tvCommentsSection.setOnClickListener {
             booksAdapter.updateBooks(commentedBooks)
+            highlightSelectedTab(tvCommentsSection, tvUploadedSection)
         }
 
         tvUploadedSection.setOnClickListener {
             booksAdapter.updateBooks(uploadedBooks)
+            highlightSelectedTab(tvUploadedSection, tvCommentsSection)
+
         }
 
         // טעינת מידע
         loadUserData()
 
         return view
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun highlightSelectedTab(selected: TextView, unselected: TextView) {
+        selected.setTextColor(resources.getColor(R.color.black, null))
+        unselected.setTextColor(resources.getColor(R.color.gray, null))
     }
 
     private fun loadUserData() {
