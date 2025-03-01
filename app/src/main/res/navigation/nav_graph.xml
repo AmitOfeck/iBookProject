@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/registrationFragment">
+    app:startDestination="@id/addBookFragment">
 
     <!-- Profile Creation Fragment (המסך הראשון) -->
     <fragment
@@ -10,6 +10,16 @@
         android:name="com.example.ibookproject.ui.profile.ProfileCreationFragment"
         android:label="Profile Creation"
         tools:layout="@layout/fragment_profile_creation">
+
+        <!-- נוכל להוסיף פעולות בהמשך -->
+    </fragment>
+
+    <!-- Add book Fragment (המסך הראשון) -->
+    <fragment
+        android:id="@+id/addBookFragment"
+        android:name="com.example.ibookproject.ui.addBook.AddBookFragment"
+        android:label="Add Book"
+        tools:layout="@layout/fragment_add_book">
 
         <!-- נוכל להוסיף פעולות בהמשך -->
     </fragment>
