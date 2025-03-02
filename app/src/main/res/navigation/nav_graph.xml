@@ -2,17 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/registrationFragment">
-
-    <!-- Profile Creation Fragment (המסך הראשון) -->
-    <fragment
-        android:id="@+id/profileCreationFragment"
-        android:name="com.example.ibookproject.ui.profile.ProfileCreationFragment"
-        android:label="Profile Creation"
-        tools:layout="@layout/fragment_profile_creation">
-
-        <!-- נוכל להוסיף פעולות בהמשך -->
-    </fragment>
+    app:startDestination="@id/loginFragment">
 
     <!-- Login Fragment -->
     <fragment
@@ -21,12 +11,12 @@
         android:label="Login"
         tools:layout="@layout/fragment_login">
 
-        <!-- Navigate to Registration -->
+        <!-- מעבר למסך ההרשמה -->
         <action
             android:id="@+id/action_loginFragment_to_registrationFragment"
             app:destination="@id/registrationFragment"/>
 
-        <!-- Navigate to Dashboard -->
+        <!-- מעבר ללוח הבקרה -->
         <action
             android:id="@+id/action_loginFragment_to_dashboardFragment"
             app:destination="@id/dashboardFragment"/>
@@ -39,7 +29,7 @@
         android:label="Registration"
         tools:layout="@layout/fragment_registration">
 
-        <!-- Navigate back to Login -->
+        <!-- מעבר חזרה למסך ההתחברות -->
         <action
             android:id="@+id/action_registrationFragment_to_loginFragment"
             app:destination="@id/loginFragment"/>
@@ -50,5 +40,19 @@
         android:id="@+id/dashboardFragment"
         android:name="com.example.ibookproject.ui.dashboard.DashboardFragment"
         android:label="Dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard">
+
+        <!-- ניווט לפרופיל -->
+        <action
+            android:id="@+id/action_dashboardFragment_to_profileCreationFragment"
+            app:destination="@id/profileCreationFragment"/>
+    </fragment>
+
+    <!-- Profile Creation Fragment -->
+    <fragment
+        android:id="@+id/profileCreationFragment"
+        android:name="com.example.ibookproject.ui.profile.ProfileCreationFragment"
+        android:label="Profile Creation"
+        tools:layout="@layout/fragment_profile_creation" />
+
 </navigation>
