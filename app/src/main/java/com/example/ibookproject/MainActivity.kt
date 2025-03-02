@@ -27,26 +27,27 @@ class MainActivity : AppCompatActivity() {
         val bottomNavView: BottomNavigationView = binding.bottomNavigationView
         bottomNavView.setupWithNavController(navController)
 
-        // מחזיר את כותרת ה-ActionBar שתתאים לשם הפרגמנט הנוכחי
         setupActionBarWithNavController(navController)
 
-        // הסתרת ה-BottomNavigationView במסכי ההתחברות והרישום
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.loginFragment, R.id.registrationFragment -> {
-                    bottomNavView.visibility = View.GONE
-                }
-                else -> {
-                    bottomNavView.visibility = View.VISIBLE
-                }
+                R.id.loginFragment, R.id.registrationFragment -> bottomNavView.visibility = View.GONE
+                else -> bottomNavView.visibility = View.VISIBLE
             }
         }
 
-        // ניווט ידני ב-BottomNavigationView
         bottomNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_profile -> {
-                    navController.navigate(R.id.profileCreationFragment)
+                    if (navController.currentDestination?.id != R.id.profileCreationFragment) {
+                        navController.navigate(R.id.profileCreationFragment)
+                    }
+                    true
+                }
+                R.id.nav_create_book -> {
+                    true
+                }
+                R.id.nav_search -> {
                     true
                 }
                 else -> false
