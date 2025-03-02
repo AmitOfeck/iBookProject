@@ -12,31 +12,17 @@
         android:padding="24dp"
         android:background="@color/light_gray">
 
-        <!-- Title "Login Screen" -->
-        <TextView
-            android:id="@+id/loginTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Login Screen"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_book_logo"
+            android:contentDescription="Book Logo"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="40dp"/>
-
-        <!-- Logo -->
-        <ImageView
-            android:id="@+id/logoImage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/ic_bookrate_logo"
-            android:contentDescription="BookRate Logo"
-            app:layout_constraintTop_toBottomOf="@id/loginTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="20dp"/>
 
         <!-- Email Input -->
         <com.google.android.material.textfield.TextInputLayout

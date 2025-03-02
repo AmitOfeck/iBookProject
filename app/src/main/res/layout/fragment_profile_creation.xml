@@ -12,19 +12,35 @@
         android:padding="24dp"
         android:background="@color/light_gray">
 
-        <!-- BookRate Logo Title -->
-        <TextView
-            android:id="@+id/bookRateLogo"
+        <!-- Book Logo + Title iBook -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📖 BookRate"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
+            android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"/>
+            android:layout_marginStart="16dp">
+
+            <!-- Book Logo -->
+            <ImageView
+                android:id="@+id/bookLogo"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_book_logo"
+                android:contentDescription="Book Logo"/>
+
+            <!-- Title "iBook" -->
+            <TextView
+                android:id="@+id/ibookTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="iBook"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
 
         <!-- Skip Button -->
         <TextView
@@ -48,7 +64,7 @@
             android:contentDescription="Profile Picture"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_default_profile"
-            app:layout_constraintTop_toBottomOf="@id/bookRateLogo"
+            app:layout_constraintTop_toBottomOf="@id/bookLogo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="30dp"/>
@@ -59,6 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload Picture"
+            android:textColor="@color/black"
             android:background="?android:attr/selectableItemBackground"
             app:layout_constraintTop_toBottomOf="@id/profileImage"
             app:layout_constraintStart_toStartOf="parent"
