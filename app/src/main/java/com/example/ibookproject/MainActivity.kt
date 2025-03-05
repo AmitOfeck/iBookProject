@@ -39,9 +39,6 @@ class MainActivity : AppCompatActivity() {
         bottomNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_profile -> {
-                    if (navController.currentDestination?.id != R.id.profileCreationFragment) {
-                        navController.navigate(R.id.profileCreationFragment)
-                    }
                     true
                 }
                 R.id.nav_create_book -> {
