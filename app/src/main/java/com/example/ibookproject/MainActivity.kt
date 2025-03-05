@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.loginFragment, R.id.registrationFragment -> bottomNavView.visibility = View.GONE
+                R.id.loginFragment, R.id.registrationFragment , R.id.profileCreationFragment -> bottomNavView.visibility = View.GONE
                 else -> bottomNavView.visibility = View.VISIBLE
             }
         }
@@ -39,9 +39,6 @@ class MainActivity : AppCompatActivity() {
         bottomNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_profile -> {
-                    if (navController.currentDestination?.id != R.id.profileCreationFragment) {
-                        navController.navigate(R.id.profileCreationFragment)
-                    }
                     true
                 }
                 R.id.nav_create_book -> {
