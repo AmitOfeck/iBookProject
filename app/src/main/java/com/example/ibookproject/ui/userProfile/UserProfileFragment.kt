@@ -1,5 +1,6 @@
 package com.example.ibookproject.ui.userProfile
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,10 +10,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ibookproject.R
-import com.example.ibookproject.ui.book.Book
+import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.book.BooksAdapter
 
 class UserProfileFragment : Fragment() {
@@ -27,17 +30,12 @@ class UserProfileFragment : Fragment() {
     private lateinit var rvUserBooks: RecyclerView
     private lateinit var booksAdapter: BooksAdapter
 
-    private val uploadedBooks = listOf(
-        Book("The Great", "John Smith", "Adventure", 4, R.drawable.img),
-        Book("Mystery at the", "Emily Clark", "Mystery",4, R.drawable.img),
-        Book("Science and", "Dr. Alice Wong", "Non-Fiction",4, R.drawable.img)
-    )
+    private val userProfileSearchView: UserProfileSearchView by activityViewModels()
+    private var uploadedBooks = emptyList<BookEntity>()
+    private val commentedBooks = emptyList<BookEntity>()
+    // TODO: get commented books from DB
 
-    private val commentedBooks = listOf(
-        Book("Historical Tales", "Michael Brown", "History", 4,R.drawable.img),
-        Book("Fantasy Realm", "Laura Green", "Fantasy", 4,R.drawable.img)
-    )
-
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,7 +54,12 @@ class UserProfileFragment : Fragment() {
 
         // הגדרת רשימת הספרים
         rvUserBooks.layoutManager = LinearLayoutManager(requireContext())
-        booksAdapter = BooksAdapter(uploadedBooks) // ברירת מחדל: מציגים ספרים שהועלו
+        booksAdapter = BooksAdapter(uploadedBooks, { bookId ->
+            val bundle = Bundle().apply {
+                putInt("bookId", bookId)
+            }
+            findNavController().navigate(R.id.action_userProfileFragment_to_bookDetailsFragment, bundle)
+        })
         rvUserBooks.adapter = booksAdapter
 
         // מאזינים ללחיצה על כפתורי הסטטיסטיקה
@@ -71,8 +74,13 @@ class UserProfileFragment : Fragment() {
 
         }
 
-        // טעינת מידע
         loadUserData()
+
+        val userId = getUserId(requireContext())
+        userProfileSearchView.getBooksByUser(userId!!).observe(viewLifecycleOwner) { books ->
+            uploadedBooks = books.toMutableList()
+            booksAdapter.updateBooks(uploadedBooks)
+        }
 
         return view
     }
@@ -81,6 +89,11 @@ class UserProfileFragment : Fragment() {
     private fun highlightSelectedTab(selected: TextView, unselected: TextView) {
         selected.setTextColor(resources.getColor(R.color.black, null))
         unselected.setTextColor(resources.getColor(R.color.gray, null))
+    }
+
+    private fun getUserId(context: Context): String? {
+        val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+        return sharedPref.getString("user_id", null)
     }
 
     private fun loadUserData() {

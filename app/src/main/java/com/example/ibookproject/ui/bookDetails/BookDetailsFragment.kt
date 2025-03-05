@@ -10,8 +10,9 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.bumptech.glide.Glide
 import com.example.ibookproject.R
-import com.example.ibookproject.ui.book.Book
 
 class BookDetailsFragment : Fragment() {
 
@@ -24,6 +25,8 @@ class BookDetailsFragment : Fragment() {
     private lateinit var etComment: EditText
     private lateinit var btnPostComment: Button
     private lateinit var ivBookCover: ImageView
+
+    private val bookViewModel: BookDetailsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,25 +43,24 @@ class BookDetailsFragment : Fragment() {
         etComment = view.findViewById(R.id.etComment)
         btnPostComment = view.findViewById(R.id.btnPostComment)
         ivBookCover = view.findViewById(R.id.ivBookCover)
-        loadBookData()
         setupListeners()
 
+        arguments?.getInt("bookId")?.let { bookId ->
+            bookViewModel.getBookById(bookId).observe(viewLifecycleOwner) { book ->
+                val comments = emptyList<String>()
+
+                tvBookTitle.text = book.title
+                tvBookAuthor.text = "by ${book.author}"
+                ratingBar.rating = book.rating
+                tvComments.text = comments.joinToString("\n")
+
+                Glide.with(requireContext())
+                    .load(book.coverImage)
+                    .into(ivBookCover)
+            }
+        }
+
         return view
-    }
-
-    private fun loadBookData() {
-        // נתונים לדוגמה (יש להחליף בשליפה ממסד נתונים)
-        val book = Book("The Great Adventure", "John Smith", "Adventure",4, R.drawable.img)
-        val comments = listOf(
-            "A thrilling read from start to finish! - Alice B.",
-            "Couldn't put it down! - Robert L."
-        )
-
-        tvBookTitle.text = book.title
-        tvBookAuthor.text = "by ${book.author}"
-        ratingBar.rating = 4.5f // ניתן להחליף בנתונים אמיתיים
-        tvComments.text = comments.joinToString("\n")
-        ivBookCover.setImageResource(book.imageRes)
     }
 
     private fun setupListeners() {
