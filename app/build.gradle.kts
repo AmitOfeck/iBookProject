@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.room.runtime)
     kapt(libs.room.compiler)
     implementation(libs.room.ktx)
+    implementation(libs.glide)
+    kapt(libs.glide.compiler)
 }
 
 apply(plugin = "com.google.gms.google-services")
