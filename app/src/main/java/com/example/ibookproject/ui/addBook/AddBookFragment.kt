@@ -44,7 +44,7 @@ class AddBookFragment : Fragment() {
             val author = binding.authorInput.text.toString().trim()
             val genre = binding.genreInput.text.toString().trim()
             val description = binding.descriptionInput.text.toString().trim()
-            val rating = binding.ratingBar.rating.toInt()
+            val rating = binding.ratingBar.rating.toFloat()
 
             if (title.isEmpty() || author.isEmpty() || genre.isEmpty() || description.isEmpty()) {
                 Toast.makeText(requireContext(), "נא למלא את כל השדות", Toast.LENGTH_SHORT).show()

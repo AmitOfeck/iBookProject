@@ -6,12 +6,12 @@ import kotlinx.coroutines.flow.Flow
 
 class BookRepository(private val bookDao: BookDao) {
 
-    fun getBooksByGenres(genres: List<String>): Flow<List<BookEntity>> {
-        return bookDao.getBooksByGenres(genres)
-    }
-
     fun getBooksByUploadingUser(userId: String): Flow<List<BookEntity>> {
         return bookDao.getBooksByUserId(userId)
+    }
+
+    fun getBoosById(bookId: Int): Flow<BookEntity> {
+        return bookDao.getBooksById(bookId)
     }
 
     fun getAllBooks(): Flow<List<BookEntity>> {

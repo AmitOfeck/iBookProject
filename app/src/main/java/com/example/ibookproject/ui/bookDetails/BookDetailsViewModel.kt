@@ -1,4 +1,4 @@
-package com.example.ibookproject.ui.search
+package com.example.ibookproject.ui.bookDetails
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -8,12 +8,10 @@ import com.example.ibookproject.data.database.BookDatabase
 import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.repository.BookRepository
 
-class BookSearchViewModel(application: Application) : AndroidViewModel(application) {
+class BookDetailsViewModel(application: Application) : AndroidViewModel(application)  {
     private val bookRepository: BookRepository = BookRepository(BookDatabase.getDatabase(application).bookDao())
 
-    fun getAllBooks(): LiveData<List<BookEntity>> {
-        return bookRepository.getAllBooks().asLiveData()
+    fun getBookById(bookId: Int): LiveData<BookEntity> {
+        return bookRepository.getBoosById(bookId).asLiveData()
     }
 }
-
-
