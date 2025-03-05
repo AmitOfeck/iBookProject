@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ibookproject.R
-import com.example.ibookproject.ui.book.Book
+import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.book.BooksAdapter
 
 class UserProfileFragment : Fragment() {
@@ -27,17 +27,11 @@ class UserProfileFragment : Fragment() {
     private lateinit var rvUserBooks: RecyclerView
     private lateinit var booksAdapter: BooksAdapter
 
-    private val uploadedBooks = listOf(
-        Book("The Great", "John Smith", "Adventure", 4, R.drawable.img),
-        Book("Mystery at the", "Emily Clark", "Mystery",4, R.drawable.img),
-        Book("Science and", "Dr. Alice Wong", "Non-Fiction",4, R.drawable.img)
-    )
+    private val uploadedBooks = emptyList<BookEntity>()
 
-    private val commentedBooks = listOf(
-        Book("Historical Tales", "Michael Brown", "History", 4,R.drawable.img),
-        Book("Fantasy Realm", "Laura Green", "Fantasy", 4,R.drawable.img)
-    )
+    private val commentedBooks = emptyList<BookEntity>()
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

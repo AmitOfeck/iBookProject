@@ -11,10 +11,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ibookproject.R
-import com.example.ibookproject.ui.book.Book
+import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.book.BooksAdapter
 
 class BookSearchFragment : Fragment() {
@@ -25,13 +26,9 @@ class BookSearchFragment : Fragment() {
     private lateinit var genreButtons: List<Button>
     private lateinit var rvBooks: RecyclerView
 
-    private var allBooks = listOf(
-        Book("The Great", "John Smith", "Adventure", 4, R.drawable.img),
-        Book("Mystery at the Mansion", "Emily Clark", "Mystery", 4, R.drawable.img),
-        Book("Science and Discovery", "Dr. Alice Wong", "Non-Fiction", 4, R.drawable.img)
-    )
+    private val bookViewModel: BookSearchViewModel by activityViewModels()
 
-    private var displayedBooks = allBooks.toMutableList()
+    private var displayedBooks = mutableListOf<BookEntity>()
     private val selectedGenres = mutableSetOf<String>()
 
     override fun onCreateView(
@@ -79,22 +76,28 @@ class BookSearchFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
+        // **טעינת הנתונים מה-ViewModel**
+        bookViewModel.getAllBooks().observe(viewLifecycleOwner) { books ->
+            displayedBooks = books.toMutableList()
+            booksAdapter.updateBooks(displayedBooks)
+        }
+
         return view
     }
 
     private fun filterBooks() {
         val query = etSearch.text.toString().lowercase()
-        displayedBooks = allBooks.filter {
+        val filteredBooks = displayedBooks.filter {
             it.title.lowercase().contains(query) ||
                     it.author.lowercase().contains(query) ||
                     it.genre.lowercase().contains(query)
         }.toMutableList()
 
         if (selectedGenres.isNotEmpty()) {
-            displayedBooks = displayedBooks.filter { it.genre in selectedGenres }.toMutableList()
+            filteredBooks.retainAll { it.genre in selectedGenres }
         }
 
-        booksAdapter.updateBooks(displayedBooks)
+        booksAdapter.updateBooks(filteredBooks)
     }
 
     private fun toggleGenreFilter(button: Button) {

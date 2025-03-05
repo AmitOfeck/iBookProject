@@ -6,9 +6,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.ibookproject.R
+import com.example.ibookproject.data.entities.BookEntity
 
-class BooksAdapter(private var books: List<Book>) :
+class BooksAdapter(private var books: List<BookEntity>) :
     RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
@@ -30,15 +32,19 @@ class BooksAdapter(private var books: List<Book>) :
         private val tvBookAuthor: TextView = itemView.findViewById(R.id.tvBookAuthor)
         private val tvBookGenre: TextView = itemView.findViewById(R.id.tvBookGenre)
 
-        fun bind(book: Book) {
-            ivBookCover.setImageResource(book.imageRes)
+        fun bind(book: BookEntity) {
             tvBookTitle.text = book.title
             tvBookAuthor.text = "by ${book.author}"
             tvBookGenre.text = "Genre: ${book.genre}"
+
+            // טעינת תמונה עם Glide
+            Glide.with(itemView.context)
+                .load(book.coverImage)
+                .into(ivBookCover)
         }
     }
 
-    fun updateBooks(newBooks: List<Book>) {
+    fun updateBooks(newBooks: List<BookEntity>) {
         books = newBooks
         notifyDataSetChanged()
     }
