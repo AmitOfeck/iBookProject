@@ -39,7 +39,7 @@ class LoginFragment : Fragment() {
             binding.loginButton.isEnabled = false // מניעת לחיצות כפולות
 
             // התחברות המשתמש
-            AuthManager.signIn(email, password) { success, errorMessage ->
+            AuthManager.signIn(requireContext(), email, password) { success, errorMessage ->
                 binding.loginButton.isEnabled = true // הפעלת הכפתור מחדש
 
                 if (success) {
