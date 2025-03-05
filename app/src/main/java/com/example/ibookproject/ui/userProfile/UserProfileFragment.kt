@@ -28,14 +28,14 @@ class UserProfileFragment : Fragment() {
     private lateinit var booksAdapter: BooksAdapter
 
     private val uploadedBooks = listOf(
-        Book("The Great", "John Smith", "Adventure", R.drawable.img),
-        Book("Mystery at the", "Emily Clark", "Mystery", R.drawable.img),
-        Book("Science and", "Dr. Alice Wong", "Non-Fiction", R.drawable.img)
+        Book("The Great", "John Smith", "Adventure", 4, R.drawable.img),
+        Book("Mystery at the", "Emily Clark", "Mystery",4, R.drawable.img),
+        Book("Science and", "Dr. Alice Wong", "Non-Fiction",4, R.drawable.img)
     )
 
     private val commentedBooks = listOf(
-        Book("Historical Tales", "Michael Brown", "History", R.drawable.img),
-        Book("Fantasy Realm", "Laura Green", "Fantasy", R.drawable.img)
+        Book("Historical Tales", "Michael Brown", "History", 4,R.drawable.img),
+        Book("Fantasy Realm", "Laura Green", "Fantasy", 4,R.drawable.img)
     )
 
     override fun onCreateView(

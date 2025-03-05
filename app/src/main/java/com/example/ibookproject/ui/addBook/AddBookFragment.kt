@@ -21,7 +21,6 @@ class AddBookFragment : Fragment() {
     ): View {
         _binding = FragmentAddBookBinding.inflate(inflater, container, false)
 
-        // בחירת תמונה מהגלריה
         val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
                 imageUri = uri
@@ -33,7 +32,6 @@ class AddBookFragment : Fragment() {
             pickImageLauncher.launch("image/*")
         }
 
-        // לחיצה על כפתור הוספת הספר
         binding.submitButton.setOnClickListener {
             val title = binding.bookTitleInput.text.toString().trim()
             val author = binding.authorInput.text.toString().trim()

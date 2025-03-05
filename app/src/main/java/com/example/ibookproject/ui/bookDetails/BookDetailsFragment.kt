@@ -48,7 +48,7 @@ class BookDetailsFragment : Fragment() {
 
     private fun loadBookData() {
         // נתונים לדוגמה (יש להחליף בשליפה ממסד נתונים)
-        val book = Book("The Great Adventure", "John Smith", "Adventure", R.drawable.img)
+        val book = Book("The Great Adventure", "John Smith", "Adventure",4, R.drawable.img)
         val comments = listOf(
             "A thrilling read from start to finish! - Alice B.",
             "Couldn't put it down! - Robert L."
