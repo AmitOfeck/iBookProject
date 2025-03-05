@@ -32,6 +32,7 @@ class BookSearchFragment : Fragment() {
     )
 
     private var displayedBooks = allBooks.toMutableList()
+    private val selectedGenres = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -63,7 +64,7 @@ class BookSearchFragment : Fragment() {
 
         genreButtons.forEach { button ->
             button.setOnClickListener {
-                filterBooksByGenre(button.text.toString())
+                toggleGenreFilter(button)
             }
         }
 
@@ -84,16 +85,28 @@ class BookSearchFragment : Fragment() {
     private fun filterBooks() {
         val query = etSearch.text.toString().lowercase()
         displayedBooks = allBooks.filter {
-                    it.title.lowercase().contains(query) ||
+            it.title.lowercase().contains(query) ||
                     it.author.lowercase().contains(query) ||
                     it.genre.lowercase().contains(query)
         }.toMutableList()
+
+        if (selectedGenres.isNotEmpty()) {
+            displayedBooks = displayedBooks.filter { it.genre in selectedGenres }.toMutableList()
+        }
+
         booksAdapter.updateBooks(displayedBooks)
     }
 
-    private fun filterBooksByGenre(genre: String) {
-        displayedBooks = allBooks.filter { it.genre.equals(genre, ignoreCase = true) }.toMutableList()
-        booksAdapter.updateBooks(displayedBooks)
+    private fun toggleGenreFilter(button: Button) {
+        val genre = button.text.toString()
+        if (selectedGenres.contains(genre)) {
+            selectedGenres.remove(genre)
+            button.setBackgroundColor(resources.getColor(R.color.purple_700))
+        } else {
+            selectedGenres.add(genre)
+            button.setBackgroundColor(resources.getColor(R.color.black))
+        }
+        filterBooks()
     }
 
     private fun sortBooks(option: String) {
