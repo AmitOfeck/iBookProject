@@ -32,6 +32,7 @@ class UserProfileFragment : Fragment() {
     private val userProfileSearchView: UserProfileSearchView by activityViewModels()
     private var uploadedBooks = emptyList<BookEntity>()
     private val commentedBooks = emptyList<BookEntity>()
+    // TODO: get commented books from DB
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateView(

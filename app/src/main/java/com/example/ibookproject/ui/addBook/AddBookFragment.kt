@@ -67,6 +67,8 @@ class AddBookFragment : Fragment() {
 
             addBookViewModel.addBook(newBook)
 
+            // TODO: save comment?
+
             Toast.makeText(requireContext(), "הספר נוסף בהצלחה!", Toast.LENGTH_SHORT).show()
 
             binding.bookTitleInput.text.clear()
