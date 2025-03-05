@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ibookproject.R
@@ -53,7 +54,12 @@ class UserProfileFragment : Fragment() {
 
         // הגדרת רשימת הספרים
         rvUserBooks.layoutManager = LinearLayoutManager(requireContext())
-        booksAdapter = BooksAdapter(uploadedBooks) // ברירת מחדל: מציגים ספרים שהועלו
+        booksAdapter = BooksAdapter(uploadedBooks, { bookId ->
+            val bundle = Bundle().apply {
+                putInt("bookId", bookId)
+            }
+            findNavController().navigate(R.id.action_userProfileFragment_to_bookDetailsFragment, bundle)
+        })
         rvUserBooks.adapter = booksAdapter
 
         // מאזינים ללחיצה על כפתורי הסטטיסטיקה

@@ -62,6 +62,10 @@
         android:name="com.example.ibookproject.ui.addBook.AddBookFragment"
         android:label="Add Book"
         tools:layout="@layout/fragment_add_book">
+
+        <action
+            android:id="@+id/action_addBookFragment_to_bookDetailsFragment"
+            app:destination="@id/bookDetailsFragment"/>
     </fragment>
 
     <!-- Search book Fragment-->
@@ -70,6 +74,10 @@
         android:name="com.example.ibookproject.ui.search.BookSearchFragment"
         android:label="Search Book"
         tools:layout="@layout/fragment_search">
+
+        <action
+            android:id="@+id/action_searchBookFragment_to_bookDetailsFragment"
+            app:destination="@id/bookDetailsFragment"/>
     </fragment>
 
     <!-- Book Details Fragment-->
@@ -78,6 +86,11 @@
         android:name="com.example.ibookproject.ui.bookDetails.BookDetailsFragment"
         android:label="Book Details"
         tools:layout="@layout/fragment_book_details">
+
+        <argument
+            android:name="bookId"
+            app:argType="integer" />
+
     </fragment>
 
     <!-- User profile Fragment-->
@@ -87,6 +100,9 @@
         android:label="User Profile"
         tools:layout="@layout/fragment_user_profile">
 
+        <action
+            android:id="@+id/action_userProfileFragment_to_bookDetailsFragment"
+            app:destination="@id/bookDetailsFragment"/>
     </fragment>
 
 </navigation>

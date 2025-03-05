@@ -10,23 +10,21 @@ import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
 
-class BooksAdapter(private var books: List<BookEntity>) :
+class BooksAdapter(private var books: List<BookEntity>, private val onBookClick: (Int) -> Unit) :
     RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_book, parent, false)
-        return BookViewHolder(view)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_book, parent, false)
+        return BookViewHolder(view, onBookClick)  // 🔹 מעביר את ה-Callback ל-ViewHolder
     }
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
-        val book = books[position]
-        holder.bind(book)
+        holder.bind(books[position])
     }
 
     override fun getItemCount(): Int = books.size
 
-    class BookViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class BookViewHolder(itemView: View, private val onBookClick: (Int) -> Unit) : RecyclerView.ViewHolder(itemView) {  // 🔹 מקבל את ה-Callback
         private val ivBookCover: ImageView = itemView.findViewById(R.id.ivBookCover)
         private val tvBookTitle: TextView = itemView.findViewById(R.id.tvBookTitle)
         private val tvBookAuthor: TextView = itemView.findViewById(R.id.tvBookAuthor)
@@ -41,6 +39,10 @@ class BooksAdapter(private var books: List<BookEntity>) :
             Glide.with(itemView.context)
                 .load(book.coverImage)
                 .into(ivBookCover)
+
+            itemView.setOnClickListener {
+                onBookClick(book.id)  // 🔹 קריאה ל-Callback עם ה-ID של הספר
+            }
         }
     }
 

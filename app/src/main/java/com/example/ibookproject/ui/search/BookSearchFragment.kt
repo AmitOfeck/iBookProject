@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ibookproject.R
@@ -47,7 +48,12 @@ class BookSearchFragment : Fragment() {
             view.findViewById(R.id.btnHistory)
         )
 
-        booksAdapter = BooksAdapter(displayedBooks)
+        booksAdapter = BooksAdapter(displayedBooks, { bookId ->
+            val bundle = Bundle().apply {
+                putInt("bookId", bookId)
+            }
+            findNavController().navigate(R.id.action_searchBookFragment_to_bookDetailsFragment, bundle)
+        })
         rvBooks.layoutManager = LinearLayoutManager(context)
         rvBooks.adapter = booksAdapter
 
