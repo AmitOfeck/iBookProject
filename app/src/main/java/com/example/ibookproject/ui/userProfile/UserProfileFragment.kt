@@ -1,5 +1,6 @@
 package com.example.ibookproject.ui.userProfile
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ibookproject.R
@@ -27,8 +29,8 @@ class UserProfileFragment : Fragment() {
     private lateinit var rvUserBooks: RecyclerView
     private lateinit var booksAdapter: BooksAdapter
 
-    private val uploadedBooks = emptyList<BookEntity>()
-
+    private val userProfileSearchView: UserProfileSearchView by activityViewModels()
+    private var uploadedBooks = emptyList<BookEntity>()
     private val commentedBooks = emptyList<BookEntity>()
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -65,8 +67,13 @@ class UserProfileFragment : Fragment() {
 
         }
 
-        // טעינת מידע
         loadUserData()
+
+        val userId = getUserId(requireContext())
+        userProfileSearchView.getBooksByUser(userId!!).observe(viewLifecycleOwner) { books ->
+            uploadedBooks = books.toMutableList()
+            booksAdapter.updateBooks(uploadedBooks)
+        }
 
         return view
     }
@@ -75,6 +82,11 @@ class UserProfileFragment : Fragment() {
     private fun highlightSelectedTab(selected: TextView, unselected: TextView) {
         selected.setTextColor(resources.getColor(R.color.black, null))
         unselected.setTextColor(resources.getColor(R.color.gray, null))
+    }
+
+    private fun getUserId(context: Context): String? {
+        val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+        return sharedPref.getString("user_id", null)
     }
 
     private fun loadUserData() {
