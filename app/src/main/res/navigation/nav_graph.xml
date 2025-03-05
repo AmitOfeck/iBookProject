@@ -4,19 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/loginFragment">
 
-    <!-- Login Fragment -->
+    <!-- Login Fragment -->    <!-- Login Fragment -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.ibookproject.ui.auth.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
 
-        <!-- מעבר למסך ההרשמה -->
         <action
             android:id="@+id/action_loginFragment_to_registrationFragment"
             app:destination="@id/registrationFragment"/>
 
-        <!-- מעבר ללוח הבקרה -->
         <action
             android:id="@+id/action_loginFragment_to_dashboardFragment"
             app:destination="@id/dashboardFragment"/>
@@ -29,9 +27,20 @@
         android:label="Registration"
         tools:layout="@layout/fragment_registration">
 
-        <!-- מעבר חזרה למסך ההתחברות -->
         <action
-            android:id="@+id/action_registrationFragment_to_loginFragment"
+            android:id="@+id/action_registrationFragment_to_profileCreationFragment"
+            app:destination="@id/profileCreationFragment"/>
+    </fragment>
+
+    <!-- Profile Creation Fragment -->
+    <fragment
+        android:id="@+id/profileCreationFragment"
+        android:name="com.example.ibookproject.ui.profile.ProfileCreationFragment"
+        android:label="Profile Creation"
+        tools:layout="@layout/fragment_profile_creation">
+
+        <action
+            android:id="@+id/action_profileCreationFragment_to_loginFragment"
             app:destination="@id/loginFragment"/>
     </fragment>
 
@@ -42,18 +51,10 @@
         android:label="Dashboard"
         tools:layout="@layout/fragment_dashboard">
 
-        <!-- ניווט לפרופיל -->
         <action
             android:id="@+id/action_dashboardFragment_to_profileCreationFragment"
             app:destination="@id/profileCreationFragment"/>
     </fragment>
-
-    <!-- Profile Creation Fragment -->
-    <fragment
-        android:id="@+id/profileCreationFragment"
-        android:name="com.example.ibookproject.ui.profile.ProfileCreationFragment"
-        android:label="Profile Creation"
-        tools:layout="@layout/fragment_profile_creation" />
 
     <!-- Add book Fragment-->
     <fragment

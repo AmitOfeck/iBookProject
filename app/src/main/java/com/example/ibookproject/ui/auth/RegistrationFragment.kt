@@ -47,8 +47,8 @@ class RegistrationFragment : Fragment() {
             // רישום המשתמש
             AuthManager.signUp(email, password) { success, errorMessage ->
                 if (success) {
-                    Toast.makeText(requireContext(), "נרשמת בהצלחה!", Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_registrationFragment_to_loginFragment)
+                    Toast.makeText(requireContext(), "נרשמת בהצלחה! המשך ביצירת פרופיל", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_registrationFragment_to_profileCreationFragment)
                 } else {
                     Toast.makeText(requireContext(), "שגיאה בהרשמה: $errorMessage", Toast.LENGTH_LONG).show()
                 }
@@ -57,7 +57,7 @@ class RegistrationFragment : Fragment() {
 
         // מעבר למסך ההתחברות אם יש כבר משתמש
         binding.goToLoginText.setOnClickListener {
-            findNavController().navigate(R.id.action_registrationFragment_to_loginFragment)
+            findNavController().navigate(R.id.action_registrationFragment_to_profileCreationFragment)
         }
 
         return binding.root
