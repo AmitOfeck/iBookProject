@@ -21,7 +21,7 @@ interface BookDao {
     fun getBooksByUserId(userId: String): Flow<List<BookEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBook(book: BookEntity)
+    suspend fun insertBook(book: BookEntity) : Long
 
     @Delete
     suspend fun deleteBook(book: BookEntity)

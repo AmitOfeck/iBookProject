@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.databinding.FragmentAddBookBinding
 
@@ -77,6 +79,16 @@ class AddBookFragment : Fragment() {
             binding.descriptionInput.text.clear()
             binding.ratingBar.rating = 0f
         }
+
+        // Observe the LiveData to get the bookId after the book is added
+        addBookViewModel.bookId.observe(viewLifecycleOwner, { bookId ->
+            bookId?.let {
+                val bundle = Bundle().apply {
+                    putInt("bookId", bookId.toInt())
+                }
+                findNavController().navigate(R.id.action_addBookFragment_to_bookDetailsFragment, bundle)
+            }
+        })
 
         return binding.root
     }

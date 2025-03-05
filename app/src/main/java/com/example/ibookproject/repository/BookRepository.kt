@@ -18,8 +18,9 @@ class BookRepository(private val bookDao: BookDao) {
         return bookDao.getAllBooks()
     }
 
-    suspend fun insertBook(book: BookEntity) {
-        bookDao.insertBook(book)
+    suspend fun insertBook(book: BookEntity): Long {
+        val bookId = bookDao.insertBook(book)
+        return bookId
     }
 
     suspend fun deleteBook(book: BookEntity) {
