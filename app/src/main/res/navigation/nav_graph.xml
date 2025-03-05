@@ -56,4 +56,37 @@
             app:destination="@id/profileCreationFragment"/>
     </fragment>
 
+    <!-- Add book Fragment-->
+    <fragment
+        android:id="@+id/addBookFragment"
+        android:name="com.example.ibookproject.ui.addBook.AddBookFragment"
+        android:label="Add Book"
+        tools:layout="@layout/fragment_add_book">
+    </fragment>
+
+    <!-- Search book Fragment-->
+    <fragment
+        android:id="@+id/searchBookFragment"
+        android:name="com.example.ibookproject.ui.search.BookSearchFragment"
+        android:label="Search Book"
+        tools:layout="@layout/fragment_search">
+    </fragment>
+
+    <!-- Book Details Fragment-->
+    <fragment
+        android:id="@+id/bookDetailsFragment"
+        android:name="com.example.ibookproject.ui.bookDetails.BookDetailsFragment"
+        android:label="Book Details"
+        tools:layout="@layout/fragment_book_details">
+    </fragment>
+
+    <!-- User profile Fragment-->
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="com.example.ibookproject.ui.userProfile.UserProfileFragment"
+        android:label="User Profile"
+        tools:layout="@layout/fragment_user_profile">
+
+    </fragment>
+
 </navigation>
