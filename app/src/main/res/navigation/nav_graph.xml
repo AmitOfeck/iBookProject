@@ -2,17 +2,58 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/searchBookFragment">
+    app:startDestination="@id/loginFragment">
 
-    <!-- Profile Creation Fragment (המסך הראשון) -->
+    <!-- Login Fragment -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.ibookproject.ui.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+
+        <!-- מעבר למסך ההרשמה -->
+        <action
+            android:id="@+id/action_loginFragment_to_registrationFragment"
+            app:destination="@id/registrationFragment"/>
+
+        <!-- מעבר ללוח הבקרה -->
+        <action
+            android:id="@+id/action_loginFragment_to_dashboardFragment"
+            app:destination="@id/dashboardFragment"/>
+    </fragment>
+
+    <!-- Registration Fragment -->
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="com.example.ibookproject.ui.auth.RegistrationFragment"
+        android:label="Registration"
+        tools:layout="@layout/fragment_registration">
+
+        <!-- מעבר חזרה למסך ההתחברות -->
+        <action
+            android:id="@+id/action_registrationFragment_to_loginFragment"
+            app:destination="@id/loginFragment"/>
+    </fragment>
+
+    <!-- Dashboard Fragment -->
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.example.ibookproject.ui.dashboard.DashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_dashboard">
+
+        <!-- ניווט לפרופיל -->
+        <action
+            android:id="@+id/action_dashboardFragment_to_profileCreationFragment"
+            app:destination="@id/profileCreationFragment"/>
+    </fragment>
+
+    <!-- Profile Creation Fragment -->
     <fragment
         android:id="@+id/profileCreationFragment"
         android:name="com.example.ibookproject.ui.profile.ProfileCreationFragment"
         android:label="Profile Creation"
-        tools:layout="@layout/fragment_profile_creation">
-
-        <!-- נוכל להוסיף פעולות בהמשך -->
-    </fragment>
+        tools:layout="@layout/fragment_profile_creation" />
 
     <!-- Add book Fragment-->
     <fragment
@@ -30,7 +71,7 @@
         tools:layout="@layout/fragment_search">
     </fragment>
 
-    <!-- Add book Fragment-->
+    <!-- Book Details Fragment-->
     <fragment
         android:id="@+id/bookDetailsFragment"
         android:name="com.example.ibookproject.ui.bookDetails.BookDetailsFragment"
@@ -47,41 +88,4 @@
 
     </fragment>
 
-    <!-- Login Fragment -->
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.ibookproject.ui.auth.LoginFragment"
-        android:label="Login"
-        tools:layout="@layout/fragment_login">
-
-        <!-- Navigate to Registration -->
-        <action
-            android:id="@+id/action_loginFragment_to_registrationFragment"
-            app:destination="@id/registrationFragment"/>
-
-        <!-- Navigate to Dashboard -->
-        <action
-            android:id="@+id/action_loginFragment_to_dashboardFragment"
-            app:destination="@id/dashboardFragment"/>
-    </fragment>
-
-    <!-- Registration Fragment -->
-    <fragment
-        android:id="@+id/registrationFragment"
-        android:name="com.example.ibookproject.ui.auth.RegistrationFragment"
-        android:label="Registration"
-        tools:layout="@layout/fragment_registration">
-
-        <!-- Navigate back to Login -->
-        <action
-            android:id="@+id/action_registrationFragment_to_loginFragment"
-            app:destination="@id/loginFragment"/>
-    </fragment>
-
-    <!-- Dashboard Fragment -->
-    <fragment
-        android:id="@+id/dashboardFragment"
-        android:name="com.example.ibookproject.ui.dashboard.DashboardFragment"
-        android:label="Dashboard"
-        tools:layout="@layout/fragment_dashboard" />
 </navigation>
