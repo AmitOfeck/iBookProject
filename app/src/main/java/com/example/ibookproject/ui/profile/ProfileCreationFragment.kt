@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -19,7 +20,6 @@ import com.example.ibookproject.databinding.FragmentProfileCreationBinding
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.bumptech.glide.Glide
-
 
 class ProfileCreationFragment : Fragment() {
     private var _binding: FragmentProfileCreationBinding? = null
@@ -41,7 +41,16 @@ class ProfileCreationFragment : Fragment() {
         binding.saveButton.setOnClickListener {
             val name = binding.nameInput.text.toString().trim()
             val bio = binding.bioInput.text.toString().trim()
-            val selectedGenres = listOf("Fantasy", "Sci-Fi", "Mystery")
+
+            // קבלת הז'אנרים שנבחרו
+            val selectedGenres = mutableListOf<String>()
+            if (binding.checkboxMystery.isChecked) selectedGenres.add("Mystery")
+            if (binding.checkboxSciFi.isChecked) selectedGenres.add("Science Fiction")
+            if (binding.checkboxRomance.isChecked) selectedGenres.add("Romance")
+            if (binding.checkboxFantasy.isChecked) selectedGenres.add("Fantasy")
+            if (binding.checkboxHorror.isChecked) selectedGenres.add("Horror")
+            if (binding.checkboxThriller.isChecked) selectedGenres.add("Thriller")
+
             val genresString = selectedGenres.joinToString(",")
 
             val imageUri = selectedImageUri?.toString() ?: ""
@@ -61,7 +70,11 @@ class ProfileCreationFragment : Fragment() {
 
             userViewModel.getUserById(userId).observe(viewLifecycleOwner) { savedUser ->
                 if (savedUser != null) {
-                    Log.d("ProfileCreationFragment", "User loaded: $savedUser")
+                    Log.d("ProfileCreationFragment", "User saved: $savedUser")
+                    // הדפס את המידע שנשמר
+                    Log.d("ProfileCreationFragment", "User Name: ${savedUser.name}")
+                    Log.d("ProfileCreationFragment", "User Bio: ${savedUser.bio}")
+                    Log.d("ProfileCreationFragment", "User Genres: ${savedUser.favoriteGenres}")
                 } else {
                     Log.e("ProfileCreationFragment", "User not found after saving")
                 }

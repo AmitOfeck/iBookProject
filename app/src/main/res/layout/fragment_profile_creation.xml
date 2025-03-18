@@ -175,6 +175,15 @@
                 <CheckBox android:id="@+id/checkboxRomance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Romance"/>
                 <CheckBox android:id="@+id/checkboxFantasy" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fantasy"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox android:id="@+id/checkboxHorror" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Horror"/>
+                <CheckBox android:id="@+id/checkboxThriller" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Thriller"/>
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Save Button -->
