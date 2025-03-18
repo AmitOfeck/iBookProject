@@ -19,6 +19,8 @@ import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.book.BooksAdapter
 import com.example.ibookproject.ui.profile.UserViewModel
+import com.bumptech.glide.Glide
+import android.util.Log
 
 class UserProfileFragment : Fragment() {
 
@@ -81,8 +83,13 @@ class UserProfileFragment : Fragment() {
                 tvUsername.text = user.name
                 tvUserBio.text = user.bio
 
+                // הדפסה על ה-URI של התמונה
+                Log.d("UserProfileFragment", "Profile Image URI: ${user.profileImage}")
+
                 if (!user.profileImage.isNullOrEmpty()) {
-                    ivProfilePicture.setImageURI(Uri.parse(user.profileImage))
+                    Glide.with(requireContext())
+                        .load(user.profileImage) // כאן אנחנו טוענים את התמונה ממחרוזת ה-URI
+                        .into(ivProfilePicture) // מכניסים לתוך ה-ImageView
                 }
             }
         }
