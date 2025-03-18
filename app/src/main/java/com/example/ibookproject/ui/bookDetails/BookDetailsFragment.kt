@@ -34,6 +34,7 @@ class BookDetailsFragment : Fragment() {
     private lateinit var ivBookCover: ImageView
     private var bookId: Int = -1
     private lateinit var userId: String
+    private var userBookRaiting: RatingEntity? = null
 
     private val bookViewModel: BookDetailsViewModel by activityViewModels()
     private val ratingViewModel: RatingViewModel by activityViewModels()
@@ -69,6 +70,7 @@ class BookDetailsFragment : Fragment() {
         ratingViewModel.getUserRatingForBook(userId,bookId).observe(viewLifecycleOwner) { userRating ->
             userRating?.let {
                 userRatingBar.rating = it.rating
+                userBookRaiting = it
             }
         }
 
@@ -101,7 +103,13 @@ class BookDetailsFragment : Fragment() {
             val userRating = userRatingBar.rating
 
             val rating = RatingEntity(bookId = bookId, userId = userId, rating = userRating)
-            ratingViewModel.addRating(rating)
+            if (userBookRaiting != null){
+                rating.id = userBookRaiting!!.id
+                ratingViewModel.updateRating(rating)
+            }
+            else{
+                ratingViewModel.addRating(rating)
+            }
         }
 
         btnPostComment.setOnClickListener {
