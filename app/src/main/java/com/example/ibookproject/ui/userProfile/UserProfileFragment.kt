@@ -1,6 +1,7 @@
 package com.example.ibookproject.ui.userProfile
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,6 +18,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.book.BooksAdapter
+import com.example.ibookproject.ui.profile.UserViewModel
+import com.bumptech.glide.Glide
+import android.util.Log
 
 class UserProfileFragment : Fragment() {
 
@@ -31,9 +35,9 @@ class UserProfileFragment : Fragment() {
     private lateinit var booksAdapter: BooksAdapter
 
     private val userProfileSearchView: UserProfileSearchView by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
     private var uploadedBooks = emptyList<BookEntity>()
     private val commentedBooks = emptyList<BookEntity>()
-    // TODO: get commented books from DB
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateView(
@@ -49,10 +53,8 @@ class UserProfileFragment : Fragment() {
         tvUploadedSection = view.findViewById(R.id.tvUploadedSection)
         tvUploadedBooks = view.findViewById(R.id.tvUploadedBooks)
         tvCommentsCount = view.findViewById(R.id.tvCommentsCount)
-        tvUploadedBooks = view.findViewById(R.id.tvUploadedBooks)
         rvUserBooks = view.findViewById(R.id.rvUserBooks)
 
-        // הגדרת רשימת הספרים
         rvUserBooks.layoutManager = LinearLayoutManager(requireContext())
         booksAdapter = BooksAdapter(uploadedBooks, { bookId ->
             val bundle = Bundle().apply {
@@ -62,7 +64,6 @@ class UserProfileFragment : Fragment() {
         })
         rvUserBooks.adapter = booksAdapter
 
-        // מאזינים ללחיצה על כפתורי הסטטיסטיקה
         tvCommentsSection.setOnClickListener {
             booksAdapter.updateBooks(commentedBooks)
             highlightSelectedTab(tvCommentsSection, tvUploadedSection)
@@ -71,13 +72,28 @@ class UserProfileFragment : Fragment() {
         tvUploadedSection.setOnClickListener {
             booksAdapter.updateBooks(uploadedBooks)
             highlightSelectedTab(tvUploadedSection, tvCommentsSection)
-
         }
 
         loadUserData()
 
         val userId = getUserId(requireContext())
-        userProfileSearchView.getBooksByUser(userId!!).observe(viewLifecycleOwner) { books ->
+
+        userViewModel.getUserById(userId!!).observe(viewLifecycleOwner) { user ->
+            if (user != null) {
+                tvUsername.text = user.name
+                tvUserBio.text = user.bio
+
+                Log.d("UserProfileFragment", "Profile Image URI: ${user.profileImage}")
+
+                if (!user.profileImage.isNullOrEmpty()) {
+                    Glide.with(requireContext())
+                        .load(user.profileImage)
+                        .into(ivProfilePicture)
+                }
+            }
+        }
+
+        userProfileSearchView.getBooksByUser(userId).observe(viewLifecycleOwner) { books ->
             uploadedBooks = books.toMutableList()
             booksAdapter.updateBooks(uploadedBooks)
         }
@@ -97,10 +113,7 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun loadUserData() {
-        tvUsername.text = "BookRate User"
-        tvUserBio.text = "Find me on BookRate"
         tvCommentsCount.text = "12"
         tvUploadedBooks.text = "3"
     }
 }
-
