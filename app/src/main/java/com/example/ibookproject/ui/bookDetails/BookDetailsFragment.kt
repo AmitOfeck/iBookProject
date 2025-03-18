@@ -1,5 +1,6 @@
 package com.example.ibookproject.ui.bookDetails
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +12,14 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.ibookproject.R
+import com.example.ibookproject.Utils
+import com.example.ibookproject.data.entities.CommentEntity
+import com.example.ibookproject.data.entities.RatingEntity
+import com.example.ibookproject.ui.comment.CommentViewModel
+import com.example.ibookproject.ui.rating.RatingViewModel
 
 class BookDetailsFragment : Fragment() {
 
@@ -25,13 +32,24 @@ class BookDetailsFragment : Fragment() {
     private lateinit var etComment: EditText
     private lateinit var btnPostComment: Button
     private lateinit var ivBookCover: ImageView
+    private var bookId: Int = -1
+    private lateinit var userId: String
 
     private val bookViewModel: BookDetailsViewModel by activityViewModels()
+    private val ratingViewModel: RatingViewModel by activityViewModels()
+    private val commentViewModel: CommentViewModel by activityViewModels()
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
+        bookId = arguments?.getInt("bookId") ?: -1
+        userId = Utils.getUserId(requireContext()) ?: ""
+        if (bookId.toInt() == -1 || userId == "") {
+            findNavController().navigate(R.id.loginFragment)
+            return null
+        }
         val view = inflater.inflate(R.layout.fragment_book_details, container, false)
 
         tvBookTitle = view.findViewById(R.id.tvBookTitle)
@@ -43,9 +61,24 @@ class BookDetailsFragment : Fragment() {
         etComment = view.findViewById(R.id.etComment)
         btnPostComment = view.findViewById(R.id.btnPostComment)
         ivBookCover = view.findViewById(R.id.ivBookCover)
+
+        ratingViewModel.getAverageRating(bookId).observe(viewLifecycleOwner) { avgRating ->
+            ratingBar.rating = avgRating ?: 0f
+        }
+
+        ratingViewModel.getUserRatingForBook(userId,bookId).observe(viewLifecycleOwner) { userRating ->
+            userRating?.let {
+                userRatingBar.rating = it.rating
+            }
+        }
+
+        commentViewModel.getCommentsForBook(bookId).observe(viewLifecycleOwner) { comments ->
+            tvComments.text = comments.joinToString("\n") { "${it.userId}: ${it.comment}" }
+        }
+
         setupListeners()
 
-        arguments?.getInt("bookId")?.let { bookId ->
+        bookId.let { bookId ->
             bookViewModel.getBookById(bookId).observe(viewLifecycleOwner) { book ->
                 val comments = emptyList<String>()
 
@@ -66,15 +99,17 @@ class BookDetailsFragment : Fragment() {
     private fun setupListeners() {
         btnSubmitRating.setOnClickListener {
             val userRating = userRatingBar.rating
-            // כאן ניתן לשמור את הדירוג במסד נתונים
+
+            val rating = RatingEntity(bookId = bookId, userId = userId, rating = userRating)
+            ratingViewModel.addRating(rating)
         }
 
         btnPostComment.setOnClickListener {
             val newComment = etComment.text.toString().trim()
             if (newComment.isNotEmpty()) {
-                tvComments.append("\n$newComment")
+                val comment = CommentEntity(bookId = bookId, userId = userId, comment = newComment)
+                commentViewModel.addComment(comment)
                 etComment.text.clear()
-                // כאן ניתן להוסיף את התגובה למסד נתונים
             }
         }
     }
