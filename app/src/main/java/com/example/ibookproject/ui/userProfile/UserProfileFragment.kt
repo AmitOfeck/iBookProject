@@ -83,13 +83,12 @@ class UserProfileFragment : Fragment() {
                 tvUsername.text = user.name
                 tvUserBio.text = user.bio
 
-                // הדפסה על ה-URI של התמונה
                 Log.d("UserProfileFragment", "Profile Image URI: ${user.profileImage}")
 
                 if (!user.profileImage.isNullOrEmpty()) {
                     Glide.with(requireContext())
-                        .load(user.profileImage) // כאן אנחנו טוענים את התמונה ממחרוזת ה-URI
-                        .into(ivProfilePicture) // מכניסים לתוך ה-ImageView
+                        .load(user.profileImage)
+                        .into(ivProfilePicture)
                 }
             }
         }

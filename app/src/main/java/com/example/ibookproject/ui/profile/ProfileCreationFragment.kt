@@ -18,6 +18,7 @@ import com.example.ibookproject.data.entities.UserEntity
 import com.example.ibookproject.databinding.FragmentProfileCreationBinding
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.bumptech.glide.Glide
 
 
 class ProfileCreationFragment : Fragment() {
@@ -82,7 +83,9 @@ class ProfileCreationFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 selectedImageUri = result.data?.data
-                binding.profileImage.setImageURI(selectedImageUri)
+                Glide.with(requireContext())
+                    .load(selectedImageUri)
+                    .into(binding.profileImage)
             }
         }
 
