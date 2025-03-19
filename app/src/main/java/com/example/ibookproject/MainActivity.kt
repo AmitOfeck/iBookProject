@@ -36,17 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController)
 
-        // אם ה- user_id קיים ב- SharedPreferences, נוודא שהמשתמש יתחבר
-        val sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE)
-        val userId = sharedPref.getString("user_id", null)
-
-        if (userId != null) {
-            // אם יש user_id, נוודא שהמשתמש התחבר ונווט לדשבורד
-            navController.navigate(R.id.dashboardFragment)
-        } else {
-            // אם אין user_id, נווט למסך ההתחברות
-            navController.navigate(R.id.loginFragment)
-        }
+        checkIfUserLoggedIn()
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
@@ -80,6 +70,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkIfUserLoggedIn() {
+        val sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE)
+        val userId = sharedPref.getString("user_id", null)
+
+        if (userId != null) {
+            // If there is a user_id, user is logged in. Navigate to dashboard
+            navController.navigate(R.id.dashboardFragment)
+        } else {
+            // If there is no user_id, user is not logged in. Navigate to login screen
+            navController.navigate(R.id.loginFragment)
+        }
+    }
+
     // Logout the user and navigate back to login screen
     private fun logout() {
         // Clear the user_id from SharedPreferences
@@ -88,13 +91,12 @@ class MainActivity : AppCompatActivity() {
             remove("user_id")
             apply()
         }
-        Log.d("MainActivity", "User ID removed from SharedPreferences") // הדפסה כש- user_id נמחק
 
-        // Log out from Firebase
+        // Sign out from Firebase
         FirebaseAuth.getInstance().signOut()
 
         // Navigate back to the login screen
-        findNavController(R.id.nav_host_fragment).navigate(R.id.loginFragment)
+        navController.navigate(R.id.loginFragment)
     }
 
     // Add the logout button to the ActionBar menu
@@ -118,3 +120,4 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
+
