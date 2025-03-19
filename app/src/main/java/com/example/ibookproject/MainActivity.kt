@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // NavController Initialization
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
@@ -95,6 +94,8 @@ class MainActivity : AppCompatActivity() {
         // Sign out from Firebase
         FirebaseAuth.getInstance().signOut()
 
+        invalidateOptionsMenu()
+
         // Navigate back to the login screen
         navController.navigate(R.id.loginFragment)
     }
@@ -110,10 +111,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Inflate the logout button in the ActionBar menu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_logout, menu) // This menu must be created
+        menuInflater.inflate(R.menu.menu_logout, menu) // Inflate the menu
+        // קריאה לפונקציה שתעדכן את כפתור ההתנתקות
+        updateLogoutMenu(menu)
         return true
+    }
+
+    // בדיקה אם המשתמש מחובר ומעדכנים את התפריט
+    private fun updateLogoutMenu(menu: Menu?) {
+        // בדוק אם יש user_id ב-SharedPreferences
+        val sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE)
+        val userId = sharedPref.getString("user_id", null)
+
+        // הצג את כפתור ה-logout רק אם יש user_id
+        menu?.findItem(R.id.logout_menu_item)?.isVisible = userId != null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        invalidateOptionsMenu() // עדכון התפריט בכל טעינה מחדש של האפליקציה
     }
 
     override fun onSupportNavigateUp(): Boolean {

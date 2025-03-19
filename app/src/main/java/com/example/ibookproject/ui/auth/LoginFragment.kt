@@ -40,12 +40,12 @@ class LoginFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            binding.loginButton.isEnabled = false // מניעת לחיצות כפולות
+            binding.loginButton.isEnabled = false
 
             // התחברות המשתמש
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    binding.loginButton.isEnabled = true // הפעלת הכפתור מחדש
+                    binding.loginButton.isEnabled = true
 
                     if (task.isSuccessful) {
                         // שמירת ה- userId אחרי התחברות מוצלחת
@@ -53,6 +53,8 @@ class LoginFragment : Fragment() {
                         firebaseUser?.let {
                             saveUserId(requireContext(), it.uid)
                         }
+
+                        activity?.invalidateOptionsMenu()
 
                         Toast.makeText(requireContext(), "התחברת בהצלחה!", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_loginFragment_to_dashboardFragment)
