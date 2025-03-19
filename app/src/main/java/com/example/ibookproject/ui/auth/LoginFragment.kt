@@ -1,5 +1,6 @@
 package com.example.ibookproject.ui.auth
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Patterns
 import android.view.LayoutInflater
@@ -11,6 +12,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.ibookproject.R
 import com.example.ibookproject.auth.AuthManager
 import com.example.ibookproject.databinding.FragmentLoginBinding
+import com.google.firebase.auth.FirebaseAuth
+import android.util.Log
+
 
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
@@ -39,16 +43,23 @@ class LoginFragment : Fragment() {
             binding.loginButton.isEnabled = false // מניעת לחיצות כפולות
 
             // התחברות המשתמש
-            AuthManager.signIn(requireContext(), email, password) { success, errorMessage ->
-                binding.loginButton.isEnabled = true // הפעלת הכפתור מחדש
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    binding.loginButton.isEnabled = true // הפעלת הכפתור מחדש
 
-                if (success) {
-                    Toast.makeText(requireContext(), "התחברת בהצלחה!", Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_loginFragment_to_dashboardFragment)
-                } else {
-                    Toast.makeText(requireContext(), "שגיאה: $errorMessage", Toast.LENGTH_LONG).show()
+                    if (task.isSuccessful) {
+                        // שמירת ה- userId אחרי התחברות מוצלחת
+                        val firebaseUser = FirebaseAuth.getInstance().currentUser
+                        firebaseUser?.let {
+                            saveUserId(requireContext(), it.uid)
+                        }
+
+                        Toast.makeText(requireContext(), "התחברת בהצלחה!", Toast.LENGTH_SHORT).show()
+                        findNavController().navigate(R.id.action_loginFragment_to_dashboardFragment)
+                    } else {
+                        Toast.makeText(requireContext(), "שגיאה: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    }
                 }
-            }
         }
 
         // מעבר למסך הרשמה
@@ -61,6 +72,16 @@ class LoginFragment : Fragment() {
 
     private fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    // שמירת ה- userId ב- SharedPreferences
+    private fun saveUserId(context: Context, userId: String) {
+        val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("user_id", userId)
+            apply()
+        }
+        Log.d("LoginFragment", "User ID saved: $userId")
     }
 
     override fun onDestroyView() {
