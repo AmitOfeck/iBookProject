@@ -57,7 +57,7 @@ class RegistrationFragment : Fragment() {
 
         // מעבר למסך ההתחברות אם יש כבר משתמש
         binding.goToLoginText.setOnClickListener {
-            findNavController().navigate(R.id.action_registrationFragment_to_profileCreationFragment)
+            findNavController().navigate(R.id.action_registrationFragment_to_loginFragment)
         }
 
         return binding.root
