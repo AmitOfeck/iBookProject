@@ -56,7 +56,6 @@ class UserProfileFragment : Fragment() {
         tvCommentsCount = view.findViewById(R.id.tvCommentsCount)
         rvUserBooks = view.findViewById(R.id.rvUserBooks)
 
-        // כפתור עריכת פרופיל
         val editProfileButton: Button = view.findViewById(R.id.editProfileButton)
         editProfileButton.setOnClickListener {
             findNavController().navigate(R.id.action_userProfileFragment_to_editProfileFragment)
