@@ -37,9 +37,14 @@
         android:name="com.example.ibookproject.ui.auth.RegistrationFragment"
         android:label="Registration"
         tools:layout="@layout/fragment_registration">
+
         <action
             android:id="@+id/action_registrationFragment_to_profileCreationFragment"
             app:destination="@id/profileCreationFragment"/>
+
+        <action
+            android:id="@+id/action_registrationFragment_to_loginFragment"
+            app:destination="@id/loginFragment"/>
     </fragment>
 
     <!-- Profile Creation Fragment -->
