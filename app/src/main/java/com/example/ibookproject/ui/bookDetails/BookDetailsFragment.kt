@@ -34,7 +34,7 @@ class BookDetailsFragment : Fragment() {
     private lateinit var ivBookCover: ImageView
     private var bookId: Int = -1
     private lateinit var userId: String
-    private var userBookRaiting: RatingEntity? = null
+    private var userBookRating: RatingEntity? = null
 
     private val bookViewModel: BookDetailsViewModel by activityViewModels()
     private val ratingViewModel: RatingViewModel by activityViewModels()
@@ -47,7 +47,7 @@ class BookDetailsFragment : Fragment() {
     ): View? {
         bookId = arguments?.getInt("bookId") ?: -1
         userId = Utils.getUserId(requireContext()) ?: ""
-        if (bookId.toInt() == -1 || userId == "") {
+        if (bookId == -1 || userId == "") {
             findNavController().navigate(R.id.loginFragment)
             return null
         }
@@ -70,7 +70,7 @@ class BookDetailsFragment : Fragment() {
         ratingViewModel.getUserRatingForBook(userId,bookId).observe(viewLifecycleOwner) { userRating ->
             userRating?.let {
                 userRatingBar.rating = it.rating
-                userBookRaiting = it
+                userBookRating = it
             }
         }
 
@@ -103,8 +103,8 @@ class BookDetailsFragment : Fragment() {
             val userRating = userRatingBar.rating
 
             val rating = RatingEntity(bookId = bookId, userId = userId, rating = userRating)
-            if (userBookRaiting != null){
-                rating.id = userBookRaiting!!.id
+            if (userBookRating != null){
+                rating.id = userBookRating!!.id
                 ratingViewModel.updateRating(rating)
             }
             else{
