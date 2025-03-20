@@ -37,7 +37,6 @@ class EditProfileFragment : Fragment() {
         _binding = FragmentEditProfileBinding.inflate(inflater, container, false)
         userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
 
-        // טוען את פרטי המשתמש מה-DB
         loadUserData()
 
         binding.profileImage.setOnClickListener { openGallery() }
@@ -58,12 +57,10 @@ class EditProfileFragment : Fragment() {
             if (user != null) {
                 currentUser = user
 
-                // הצגת הנתונים בטופס
                 binding.nameInput.setText(user.name)
                 binding.bioInput.setText(user.bio)
                 setSelectedGenres(user.favoriteGenres)
 
-                // טעינת תמונה
                 if (user.profileImage?.isNotEmpty() == true) {
                     Glide.with(requireContext()).load(user.profileImage).into(binding.profileImage)
                 }
