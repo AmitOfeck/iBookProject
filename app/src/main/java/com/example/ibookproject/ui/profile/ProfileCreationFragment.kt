@@ -42,7 +42,6 @@ class ProfileCreationFragment : Fragment() {
             val name = binding.nameInput.text.toString().trim()
             val bio = binding.bioInput.text.toString().trim()
 
-            // קבלת הז'אנרים שנבחרו
             val selectedGenres = mutableListOf<String>()
             if (binding.checkboxMystery.isChecked) selectedGenres.add("Mystery")
             if (binding.checkboxSciFi.isChecked) selectedGenres.add("Science Fiction")
@@ -71,7 +70,6 @@ class ProfileCreationFragment : Fragment() {
             userViewModel.getUserById(userId).observe(viewLifecycleOwner) { savedUser ->
                 if (savedUser != null) {
                     Log.d("ProfileCreationFragment", "User saved: $savedUser")
-                    // הדפס את המידע שנשמר
                     Log.d("ProfileCreationFragment", "User Name: ${savedUser.name}")
                     Log.d("ProfileCreationFragment", "User Bio: ${savedUser.bio}")
                     Log.d("ProfileCreationFragment", "User Genres: ${savedUser.favoriteGenres}")

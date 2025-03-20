@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Button
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -55,12 +56,18 @@ class UserProfileFragment : Fragment() {
         tvCommentsCount = view.findViewById(R.id.tvCommentsCount)
         rvUserBooks = view.findViewById(R.id.rvUserBooks)
 
+        val editProfileButton: Button = view.findViewById(R.id.editProfileButton)
+        editProfileButton.setOnClickListener {
+            findNavController().navigate(R.id.action_userProfileFragment_to_editProfileFragment)
+        }
+
+
         rvUserBooks.layoutManager = LinearLayoutManager(requireContext())
         booksAdapter = BooksAdapter(uploadedBooks, { bookId ->
             val bundle = Bundle().apply {
                 putInt("bookId", bookId)
             }
-            findNavController().navigate(R.id.action_userProfileFragment_to_bookDetailsFragment, bundle)
+            findNavController().navigate(R.id.action_editProfileFragment_to_userProfileFragment)
         })
         rvUserBooks.adapter = booksAdapter
 
