@@ -14,7 +14,7 @@ class BookDetailsViewModel(application: Application) : AndroidViewModel(applicat
     private val bookRepository: BookRepository = BookRepository(BookDatabase.getDatabase(application).bookDao())
 
     fun getBookById(bookId: Int): LiveData<BookEntity> {
-        return bookRepository.getBooksById(bookId).asLiveData()
+        return bookRepository.getBookById(bookId).asLiveData()
     }
 
     fun deleteBookById(bookId: Int) {

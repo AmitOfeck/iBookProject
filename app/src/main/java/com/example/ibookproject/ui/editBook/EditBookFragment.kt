@@ -11,10 +11,13 @@ import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.ibookproject.R
+import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.bookDetails.BookDetailsViewModel
+import kotlinx.coroutines.launch
 
 class EditBookFragment : Fragment() {
     private lateinit var etTitle: EditText
@@ -24,6 +27,7 @@ class EditBookFragment : Fragment() {
     private lateinit var coverImage: ImageView
     private lateinit var btnUploadImage: Button
     private lateinit var btnSave: Button
+    private lateinit var bookDetails: BookEntity
     private var imageUri: Uri? = null
 
     private val editBookViewModel: EditBookViewModel by activityViewModels()
@@ -52,10 +56,13 @@ class EditBookFragment : Fragment() {
         }
 
         bookDetailsViewModel.getBookById(bookId).observe(viewLifecycleOwner) { book ->
+            bookDetails = book
             etTitle.setText(book.title)
             etAuthor.setText(book.author)
             etGenre.setText(book.genre)
             etDescription.setText(book.description)
+
+            imageUri = Uri.parse(book.coverImage)
             Glide.with(requireContext())
                 .load(book.coverImage)
                 .into(coverImage)
@@ -73,16 +80,16 @@ class EditBookFragment : Fragment() {
         }
 
         btnSave.setOnClickListener {
-//            val updatedBook = BookEntity(
-//                id = bookId,
-//                title = etTitle.text.toString().trim(),
-//                author = etAuthor.text.toString().trim(),
-//                genre = etGenre.text.toString().trim(),
-//                coverImage = "", // TODO: Save uploaded image URL
-//                description = etDescription.text.toString().trim(),
-//            )
-//            bookViewModel.updateBook(updatedBook)
-//            findNavController().popBackStack()
+            bookDetails.title = etTitle.text.toString().trim()
+            bookDetails.author = etAuthor.text.toString().trim()
+            bookDetails.genre = etGenre.text.toString().trim()
+            bookDetails.description = etDescription.text.toString().trim()
+            bookDetails.coverImage = imageUri.toString()
+
+            lifecycleScope.launch {
+                editBookViewModel.updateBook(bookDetails)
+                findNavController().popBackStack()
+            }
         }
 
         return view

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.ibookproject.data.entities.BookEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -20,11 +21,14 @@ interface BookDao {
     fun getBooksByUserId(userId: String): Flow<List<BookEntity>>
 
     @Query("SELECT * FROM books WHERE id = :bookId")
-    fun getBooksById(bookId: Int): Flow<BookEntity>
+    fun getBookById(bookId: Int): Flow<BookEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBook(book: BookEntity) : Long
 
     @Query("DELETE FROM books WHERE id = :bookId")
     suspend fun deleteBook(bookId: Int)
+
+    @Update
+    suspend fun updateBook(book: BookEntity)
 }
