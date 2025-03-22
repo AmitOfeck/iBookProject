@@ -80,6 +80,20 @@
             app:destination="@id/bookDetailsFragment"/>
     </fragment>
 
+    <!-- Edit book Fragment-->
+    <fragment
+        android:id="@+id/editBookFragment"
+        android:name="com.example.ibookproject.ui.editBook.EditBookFragment"
+        android:label="Edit Book"
+        tools:layout="@layout/fragment_edit_book">
+        <argument
+            android:name="bookId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_editBookFragment_to_bookDetailsFragment"
+            app:destination="@id/bookDetailsFragment"/>
+    </fragment>
+
     <!-- Search book Fragment-->
     <fragment
         android:id="@+id/searchBookFragment"
@@ -100,6 +114,9 @@
         <argument
             android:name="bookId"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_bookDetailsFragment_to_editBookFragment"
+            app:destination="@id/editBookFragment"/>
     </fragment>
 
     <!-- User Profile Fragment-->
@@ -111,6 +128,9 @@
         <action
             android:id="@+id/action_userProfileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment"/>
+        <action
+            android:id="@+id/action_userProfileFragment_to_bookDetailsFragment"
+            app:destination="@id/bookDetailsFragment"/>
     </fragment>
 
 </navigation>

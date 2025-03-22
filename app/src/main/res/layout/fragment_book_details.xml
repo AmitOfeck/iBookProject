@@ -43,6 +43,13 @@
                     android:textSize="14sp"
                     android:textColor="@android:color/darker_gray" />
 
+                <TextView
+                    android:id="@+id/tvBookDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray" />
+
                 <RatingBar
                     android:id="@+id/ratingBar"
                     android:layout_width="wrap_content"
@@ -106,5 +113,24 @@
             android:background="@android:color/black"
             android:textColor="@android:color/white" />
 
+        <Button
+            android:id="@+id/btnEditBook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit Book"
+            android:background="@android:color/holo_blue_light"
+            android:textColor="@android:color/white"
+            android:visibility="gone"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btnDeleteBook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete Book"
+            android:background="@android:color/holo_red_light"
+            android:textColor="@android:color/white"
+            android:visibility="gone"
+            android:layout_marginTop="8dp" />
     </LinearLayout>
 </ScrollView>

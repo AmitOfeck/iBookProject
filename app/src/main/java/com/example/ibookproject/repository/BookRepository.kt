@@ -10,20 +10,28 @@ class BookRepository(private val bookDao: BookDao) {
         return bookDao.getBooksByUserId(userId)
     }
 
-    fun getBoosById(bookId: Int): Flow<BookEntity> {
-        return bookDao.getBooksById(bookId)
+    fun getBookById(bookId: Int): Flow<BookEntity> {
+        return bookDao.getBookById(bookId)
     }
 
     fun getAllBooks(): Flow<List<BookEntity>> {
         return bookDao.getAllBooks()
     }
 
-    suspend fun insertBook(book: BookEntity): Long {
+    suspend fun insertBook(book: BookEntity): Int {
         val bookId = bookDao.insertBook(book)
-        return bookId
+        return bookId.toInt()
     }
 
-    suspend fun deleteBook(book: BookEntity) {
-        bookDao.deleteBook(book)
+    suspend fun deleteBook(bookId: Int) {
+        bookDao.deleteBook(bookId)
+    }
+
+    suspend fun updateBook(book: BookEntity) {
+        bookDao.updateBook(book)
+    }
+
+    fun getBooksByIds(bookIds: List<Int>): Flow<List<BookEntity>> {
+        return bookDao.getBooksByIds(bookIds)
     }
 }

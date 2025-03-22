@@ -1,19 +1,25 @@
 package com.example.ibookproject.ui.addBook
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.ibookproject.R
+import com.example.ibookproject.Utils
 import com.example.ibookproject.data.entities.BookEntity
+import com.example.ibookproject.data.entities.CommentEntity
+import com.example.ibookproject.data.entities.RatingEntity
 import com.example.ibookproject.databinding.FragmentAddBookBinding
+import com.example.ibookproject.ui.Genres
+import com.example.ibookproject.ui.comment.CommentViewModel
+import com.example.ibookproject.ui.rating.RatingViewModel
 
 class AddBookFragment : Fragment() {
     private var _binding: FragmentAddBookBinding? = null
@@ -21,11 +27,18 @@ class AddBookFragment : Fragment() {
     private var imageUri: Uri? = null
 
     private val addBookViewModel: AddBookViewModel by activityViewModels()
+    private val ratingViewModel: RatingViewModel by activityViewModels()
+    private val commentViewModel: CommentViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): ScrollView? {
+        val userId = Utils.getUserId(requireContext()) ?: ""
+        if (userId == "") {
+            findNavController().navigate(R.id.loginFragment)
+            return null
+        }
         _binding = FragmentAddBookBinding.inflate(inflater, container, false)
 
         val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -39,14 +52,18 @@ class AddBookFragment : Fragment() {
             pickImageLauncher.launch("image/*")
         }
 
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, Genres.getAll())
+        binding.genreSpinner.adapter = adapter
+
         binding.submitButton.setOnClickListener {
+            val selectedGenre = binding.genreSpinner.selectedItem.toString()
             val title = binding.bookTitleInput.text.toString().trim()
             val author = binding.authorInput.text.toString().trim()
-            val genre = binding.genreInput.text.toString().trim()
             val description = binding.descriptionInput.text.toString().trim()
-            val rating = binding.ratingBar.rating.toFloat()
+            val rating = binding.ratingBar.rating
+            val comment = binding.commentsInput.text.toString().trim()
 
-            if (title.isEmpty() || author.isEmpty() || genre.isEmpty() || description.isEmpty()) {
+            if (title.isEmpty() || author.isEmpty() || selectedGenre.isEmpty() || description.isEmpty()) {
                 Toast.makeText(requireContext(), "נא למלא את כל השדות", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -56,39 +73,45 @@ class AddBookFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val userId = getUserId(requireContext())
-
             val newBook = BookEntity(
-                uploadingUserId = userId!!,
+                uploadingUserId = userId,
                 title = title,
                 author = author,
-                genre = genre,
+                description = description,
+                genre = selectedGenre,
                 rating = rating,
                 coverImage = imageUri.toString()
             )
 
             addBookViewModel.addBook(newBook)
 
-            // TODO: save comment?
-
             Toast.makeText(requireContext(), "הספר נוסף בהצלחה!", Toast.LENGTH_SHORT).show()
 
+            // ניקוי השדות אחרי הוספה
             binding.bookTitleInput.text.clear()
             binding.authorInput.text.clear()
-            binding.genreInput.text.clear()
             binding.descriptionInput.text.clear()
             binding.ratingBar.rating = 0f
-        }
 
-        // Observe the LiveData to get the bookId after the book is added
-        addBookViewModel.bookId.observe(viewLifecycleOwner, { bookId ->
-            bookId?.let {
-                val bundle = Bundle().apply {
-                    putInt("bookId", bookId.toInt())
+            addBookViewModel.bookId.observe(viewLifecycleOwner) { bookId ->
+                bookId?.let {
+                    if (rating > 0) {
+                        val ratingEntity = RatingEntity(bookId = bookId, userId = userId, rating = rating)
+                        ratingViewModel.addRating(ratingEntity)
+                    }
+
+                    if (comment.isNotEmpty()) {
+                        val commentEntity = CommentEntity(bookId = bookId, userId = userId, comment = comment)
+                        commentViewModel.addComment(commentEntity)
+                    }
+
+                    val bundle = Bundle().apply {
+                        putInt("bookId", bookId)
+                    }
+                    findNavController().navigate(R.id.action_addBookFragment_to_bookDetailsFragment, bundle)
                 }
-                findNavController().navigate(R.id.action_addBookFragment_to_bookDetailsFragment, bundle)
             }
-        })
+        }
 
         return binding.root
     }
@@ -96,10 +119,5 @@ class AddBookFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun getUserId(context: Context): String? {
-        val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
-        return sharedPref.getString("user_id", null)
     }
 }

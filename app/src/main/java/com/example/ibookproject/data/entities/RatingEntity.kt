@@ -3,15 +3,11 @@ package com.example.ibookproject.data.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "books")
-data class BookEntity(
+@Entity(tableName = "ratings")
+data class RatingEntity(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
-    var title: String,
-    var author: String,
-    var genre: String,
-    var description: String,
+    val bookId: Int,
+    val userId: String,
     val rating: Float,
-    var coverImage: String,
-    val uploadingUserId: String,
     val timestamp: Long = System.currentTimeMillis()
 )
