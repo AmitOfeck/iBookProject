@@ -23,7 +23,7 @@ class BookRepository(private val bookDao: BookDao) {
         return bookId.toInt()
     }
 
-    suspend fun deleteBook(book: BookEntity) {
-        bookDao.deleteBook(book)
+    suspend fun deleteBook(bookId: Int) {
+        bookDao.deleteBook(bookId)
     }
 }

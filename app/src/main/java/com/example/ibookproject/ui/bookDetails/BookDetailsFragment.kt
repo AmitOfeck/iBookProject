@@ -36,6 +36,8 @@ class BookDetailsFragment : Fragment() {
     private var bookId: Int = -1
     private lateinit var userId: String
     private var userBookRating: RatingEntity? = null
+    private lateinit var btnEditBook: Button
+    private lateinit var btnDeleteBook: Button
 
     private val bookViewModel: BookDetailsViewModel by activityViewModels()
     private val ratingViewModel: RatingViewModel by activityViewModels()
@@ -64,6 +66,8 @@ class BookDetailsFragment : Fragment() {
         etComment = view.findViewById(R.id.etComment)
         btnPostComment = view.findViewById(R.id.btnPostComment)
         ivBookCover = view.findViewById(R.id.ivBookCover)
+        btnEditBook = view.findViewById(R.id.btnEditBook)
+        btnDeleteBook = view.findViewById(R.id.btnDeleteBook)
 
         ratingViewModel.getAverageRating(bookId).observe(viewLifecycleOwner) { avgRating ->
             ratingBar.rating = avgRating ?: 0f
@@ -100,6 +104,14 @@ class BookDetailsFragment : Fragment() {
                 ratingBar.rating = book.rating
                 tvComments.text = comments.joinToString("\n")
 
+                if (userId == book.uploadingUserId) {
+                    btnEditBook.visibility = View.VISIBLE
+                    btnDeleteBook.visibility = View.VISIBLE
+                } else {
+                    btnEditBook.visibility = View.GONE
+                    btnDeleteBook.visibility = View.GONE
+                }
+
                 Glide.with(requireContext())
                     .load(book.coverImage)
                     .into(ivBookCover)
@@ -130,6 +142,15 @@ class BookDetailsFragment : Fragment() {
                 commentViewModel.addComment(comment)
                 etComment.text.clear()
             }
+        }
+
+        btnEditBook.setOnClickListener {
+            val bundle = Bundle().apply { putInt("bookId", bookId) }
+        }
+
+        btnDeleteBook.setOnClickListener {
+            bookViewModel.deleteBookById(bookId)
+            findNavController().navigateUp()
         }
     }
 }
