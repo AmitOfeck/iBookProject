@@ -1,5 +1,6 @@
 package com.example.ibookproject.ui.editBook
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -22,6 +24,7 @@ class EditBookFragment : Fragment() {
     private lateinit var coverImage: ImageView
     private lateinit var btnUploadImage: Button
     private lateinit var btnSave: Button
+    private var imageUri: Uri? = null
 
     private val editBookViewModel: EditBookViewModel by activityViewModels()
     private val bookDetailsViewModel: BookDetailsViewModel by activityViewModels()
@@ -37,7 +40,7 @@ class EditBookFragment : Fragment() {
         etAuthor = view.findViewById(R.id.etAuthor)
         etGenre = view.findViewById(R.id.etGenre)
         etDescription = view.findViewById(R.id.etDescription)
-        coverImage = view.findViewById(R.id.coverImage)
+        coverImage = view.findViewById(R.id.eCoverImage)
         btnUploadImage = view.findViewById(R.id.uploadImageButton)
         btnSave = view.findViewById(R.id.btnSave)
 
@@ -55,10 +58,18 @@ class EditBookFragment : Fragment() {
             etDescription.setText(book.description)
             Glide.with(requireContext())
                 .load(book.coverImage)
-                .into(coverImage)        }
+                .into(coverImage)
+        }
+
+        val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                imageUri = uri
+                coverImage.setImageURI(uri)
+            }
+        }
 
         btnUploadImage.setOnClickListener {
-            // TODO: Implement image upload logic
+            pickImageLauncher.launch("image/*")
         }
 
         btnSave.setOnClickListener {
