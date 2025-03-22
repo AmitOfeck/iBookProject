@@ -9,6 +9,7 @@ data class BookEntity(
     val title: String,
     val author: String,
     val genre: String,
+    val description: String,
     val rating: Float,
     val coverImage: String,
     val uploadingUserId: String,

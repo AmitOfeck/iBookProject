@@ -1,7 +1,6 @@
 package com.example.ibookproject.ui.search
 
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -50,7 +49,6 @@ class BookSearchFragment : Fragment() {
         )
 
         booksAdapter = BooksAdapter(displayedBooks, { bookId ->
-            Log.d("SENDING_BOOK_ID", bookId.toString())
             val bundle = Bundle().apply {
                 putInt("bookId", bookId)
             }
@@ -84,7 +82,6 @@ class BookSearchFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        // **טעינת הנתונים מה-ViewModel**
         bookViewModel.getAllBooks().observe(viewLifecycleOwner) { books ->
             displayedBooks = books.toMutableList()
             booksAdapter.updateBooks(displayedBooks)

@@ -26,6 +26,7 @@ class BookDetailsFragment : Fragment() {
 
     private lateinit var tvBookTitle: TextView
     private lateinit var tvBookAuthor: TextView
+    private lateinit var tvBookDescription: TextView
     private lateinit var ratingBar: RatingBar
     private lateinit var userRatingBar: RatingBar
     private lateinit var btnSubmitRating: Button
@@ -59,6 +60,7 @@ class BookDetailsFragment : Fragment() {
 
         tvBookTitle = view.findViewById(R.id.tvBookTitle)
         tvBookAuthor = view.findViewById(R.id.tvBookAuthor)
+        tvBookDescription = view.findViewById(R.id.tvBookDescription)
         ratingBar = view.findViewById(R.id.ratingBar)
         userRatingBar = view.findViewById(R.id.userRatingBar)
         btnSubmitRating = view.findViewById(R.id.btnSubmitRating)
@@ -101,6 +103,7 @@ class BookDetailsFragment : Fragment() {
 
                 tvBookTitle.text = book.title
                 tvBookAuthor.text = "by ${book.author}"
+                tvBookDescription.text = "description ${book.description}"
                 ratingBar.rating = book.rating
                 tvComments.text = comments.joinToString("\n")
 
@@ -146,6 +149,7 @@ class BookDetailsFragment : Fragment() {
 
         btnEditBook.setOnClickListener {
             val bundle = Bundle().apply { putInt("bookId", bookId) }
+            findNavController().navigate(R.id.action_bookDetailsFragment_to_editBookFragment, bundle)
         }
 
         btnDeleteBook.setOnClickListener {

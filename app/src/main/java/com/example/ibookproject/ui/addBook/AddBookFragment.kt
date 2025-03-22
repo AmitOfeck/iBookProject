@@ -71,6 +71,7 @@ class AddBookFragment : Fragment() {
                 uploadingUserId = userId,
                 title = title,
                 author = author,
+                description = description,
                 genre = genre,
                 rating = rating,
                 coverImage = imageUri.toString()
