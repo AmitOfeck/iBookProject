@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +17,7 @@ import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.data.entities.RatingEntity
 import com.example.ibookproject.databinding.FragmentAddBookBinding
+import com.example.ibookproject.ui.Genres
 import com.example.ibookproject.ui.comment.CommentViewModel
 import com.example.ibookproject.ui.rating.RatingViewModel
 
@@ -50,15 +52,18 @@ class AddBookFragment : Fragment() {
             pickImageLauncher.launch("image/*")
         }
 
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, Genres.getAll())
+        binding.genreSpinner.adapter = adapter
+
         binding.submitButton.setOnClickListener {
+            val selectedGenre = binding.genreSpinner.selectedItem.toString()
             val title = binding.bookTitleInput.text.toString().trim()
             val author = binding.authorInput.text.toString().trim()
-            val genre = binding.genreInput.text.toString().trim()
             val description = binding.descriptionInput.text.toString().trim()
             val rating = binding.ratingBar.rating
             val comment = binding.commentsInput.text.toString().trim()
 
-            if (title.isEmpty() || author.isEmpty() || genre.isEmpty() || description.isEmpty()) {
+            if (title.isEmpty() || author.isEmpty() || selectedGenre.isEmpty() || description.isEmpty()) {
                 Toast.makeText(requireContext(), "נא למלא את כל השדות", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -73,7 +78,7 @@ class AddBookFragment : Fragment() {
                 title = title,
                 author = author,
                 description = description,
-                genre = genre,
+                genre = selectedGenre,
                 rating = rating,
                 coverImage = imageUri.toString()
             )
@@ -85,7 +90,6 @@ class AddBookFragment : Fragment() {
             // ניקוי השדות אחרי הוספה
             binding.bookTitleInput.text.clear()
             binding.authorInput.text.clear()
-            binding.genreInput.text.clear()
             binding.descriptionInput.text.clear()
             binding.ratingBar.rating = 0f
 

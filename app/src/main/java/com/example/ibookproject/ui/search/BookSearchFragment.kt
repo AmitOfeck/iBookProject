@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
@@ -17,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
+import com.example.ibookproject.ui.Genres
 import com.example.ibookproject.ui.book.BooksAdapter
 
 class BookSearchFragment : Fragment() {
@@ -24,13 +24,13 @@ class BookSearchFragment : Fragment() {
     private lateinit var booksAdapter: BooksAdapter
     private lateinit var etSearch: EditText
     private lateinit var spinnerSort: Spinner
-    private lateinit var genreButtons: List<Button>
+    private lateinit var spinnerGenre: Spinner
     private lateinit var rvBooks: RecyclerView
 
     private val bookViewModel: BookSearchViewModel by activityViewModels()
 
     private var displayedBooks = mutableListOf<BookEntity>()
-    private val selectedGenres = mutableSetOf<String>()
+    private var selectedGenre: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -39,21 +39,16 @@ class BookSearchFragment : Fragment() {
 
         etSearch = view.findViewById(R.id.etSearch)
         spinnerSort = view.findViewById(R.id.spinnerSort)
+        spinnerGenre = view.findViewById(R.id.spinnerGenre)
         rvBooks = view.findViewById(R.id.rvBooks)
 
-        genreButtons = listOf(
-            view.findViewById(R.id.btnFiction),
-            view.findViewById(R.id.btnRomance),
-            view.findViewById(R.id.btnMystery),
-            view.findViewById(R.id.btnHistory)
-        )
-
-        booksAdapter = BooksAdapter(displayedBooks, { bookId ->
+        booksAdapter = BooksAdapter(displayedBooks) { bookId ->
             val bundle = Bundle().apply {
                 putInt("bookId", bookId)
             }
             findNavController().navigate(R.id.action_searchBookFragment_to_bookDetailsFragment, bundle)
-        })
+        }
+
         rvBooks.layoutManager = LinearLayoutManager(context)
         rvBooks.adapter = booksAdapter
 
@@ -65,16 +60,11 @@ class BookSearchFragment : Fragment() {
             false
         }
 
-        genreButtons.forEach { button ->
-            button.setOnClickListener {
-                toggleGenreFilter(button)
-            }
-        }
-
         val sortOptions = arrayOf("Ratings", "Book Title", "Author Name")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sortOptions)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerSort.adapter = adapter
+        val sortAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sortOptions)
+        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerSort.adapter = sortAdapter
+
         spinnerSort.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 sortBooks(sortOptions[position])
@@ -82,9 +72,23 @@ class BookSearchFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
+        // הוספת כל הז'אנרים ל-Spinner
+        val genresList = mutableListOf("All") + Genres.getAll()
+        val genreAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, genresList)
+        genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerGenre.adapter = genreAdapter
+
+        spinnerGenre.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                selectedGenre = if (position == 0) null else genresList[position]
+                filterBooks()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
         bookViewModel.getAllBooks().observe(viewLifecycleOwner) { books ->
             displayedBooks = books.toMutableList()
-            booksAdapter.updateBooks(displayedBooks)
+            filterBooks()
         }
 
         return view
@@ -92,29 +96,15 @@ class BookSearchFragment : Fragment() {
 
     private fun filterBooks() {
         val query = etSearch.text.toString().lowercase()
-        val filteredBooks = displayedBooks.filter {
-            it.title.lowercase().contains(query) ||
-                    it.author.lowercase().contains(query) ||
-                    it.genre.lowercase().contains(query)
+
+        val filteredBooks = displayedBooks.filter { book ->
+            (book.title.lowercase().contains(query) ||
+                    book.author.lowercase().contains(query) ||
+                    book.genre.lowercase().contains(query)) &&
+                    (selectedGenre == null || book.genre == selectedGenre)
         }.toMutableList()
 
-        if (selectedGenres.isNotEmpty()) {
-            filteredBooks.retainAll { it.genre in selectedGenres }
-        }
-
         booksAdapter.updateBooks(filteredBooks)
-    }
-
-    private fun toggleGenreFilter(button: Button) {
-        val genre = button.text.toString()
-        if (selectedGenres.contains(genre)) {
-            selectedGenres.remove(genre)
-            button.setBackgroundColor(resources.getColor(R.color.purple_700))
-        } else {
-            selectedGenres.add(genre)
-            button.setBackgroundColor(resources.getColor(R.color.black))
-        }
-        filterBooks()
     }
 
     private fun sortBooks(option: String) {
