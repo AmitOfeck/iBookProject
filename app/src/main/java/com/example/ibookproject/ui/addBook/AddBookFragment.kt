@@ -55,7 +55,8 @@ class AddBookFragment : Fragment() {
             val author = binding.authorInput.text.toString().trim()
             val genre = binding.genreInput.text.toString().trim()
             val description = binding.descriptionInput.text.toString().trim()
-            val rating = binding.ratingBar.rating.toFloat()
+            val rating = binding.ratingBar.rating
+            val comment = binding.commentsInput.text.toString().trim()
 
             if (title.isEmpty() || author.isEmpty() || genre.isEmpty() || description.isEmpty()) {
                 Toast.makeText(requireContext(), "נא למלא את כל השדות", Toast.LENGTH_SHORT).show()
@@ -95,8 +96,8 @@ class AddBookFragment : Fragment() {
                         ratingViewModel.addRating(ratingEntity)
                     }
 
-                    if (description.isNotEmpty()) {
-                        val commentEntity = CommentEntity(bookId = bookId, userId = userId, comment = description)
+                    if (comment.isNotEmpty()) {
+                        val commentEntity = CommentEntity(bookId = bookId, userId = userId, comment = comment)
                         commentViewModel.addComment(commentEntity)
                     }
 

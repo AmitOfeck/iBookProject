@@ -1,5 +1,6 @@
 package com.example.ibookproject.ui.userProfile
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -80,8 +81,6 @@ class UserProfileFragment : Fragment() {
             highlightSelectedTab(tvUploadedSection, tvCommentsSection)
         }
 
-        loadUserData()
-
         val userId = getUserId(requireContext())
 
         userViewModel.getUserById(userId!!).observe(viewLifecycleOwner) { user ->
@@ -99,17 +98,7 @@ class UserProfileFragment : Fragment() {
             }
         }
 
-        userProfileSearchView.getBooksByUser(userId).observe(viewLifecycleOwner) { books ->
-            uploadedBooks = books.toMutableList()
-            booksAdapter.updateBooks(uploadedBooks)
-        }
-
-        userProfileSearchView.getCommentsByUser(userId).observe(viewLifecycleOwner) { comments ->
-            val bookIds = comments.map { it.bookId }
-            userProfileSearchView.getBooksById(bookIds).observe(viewLifecycleOwner) { books ->
-                commentedBooks = books.toMutableList()
-            }
-        }
+        loadUserData(userId)
 
         return view
     }
@@ -125,8 +114,20 @@ class UserProfileFragment : Fragment() {
         return sharedPref.getString("user_id", null)
     }
 
-    private fun loadUserData() {
-        tvCommentsCount.text = "12"
-        tvUploadedBooks.text = "3"
+    @SuppressLint("SetTextI18n")
+    private fun loadUserData(userId: String) {
+        userProfileSearchView.getBooksByUser(userId).observe(viewLifecycleOwner) { books ->
+            uploadedBooks = books.toMutableList()
+            tvUploadedBooks.text = uploadedBooks.size.toString()
+            booksAdapter.updateBooks(uploadedBooks)
+        }
+
+        userProfileSearchView.getCommentsByUser(userId).observe(viewLifecycleOwner) { comments ->
+            val bookIds = comments.map { it.bookId }
+            userProfileSearchView.getBooksById(bookIds).observe(viewLifecycleOwner) { books ->
+                commentedBooks = books.toMutableList()
+                tvCommentsCount.text = commentedBooks.size.toString()
+            }
+        }
     }
 }
