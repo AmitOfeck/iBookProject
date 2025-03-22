@@ -16,4 +16,7 @@ interface CommentDao {
 
     @Query("DELETE FROM comments WHERE id = :commentId")
     suspend fun deleteComment(commentId: Int)
+
+    @Query("SELECT * FROM comments WHERE userId = :userId")
+    fun getCommentsByUserId(userId: String): LiveData<List<CommentEntity>>
 }

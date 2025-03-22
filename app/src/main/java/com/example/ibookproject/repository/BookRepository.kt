@@ -30,4 +30,8 @@ class BookRepository(private val bookDao: BookDao) {
     suspend fun updateBook(book: BookEntity) {
         bookDao.updateBook(book)
     }
+
+    fun getBooksByIds(bookIds: List<Int>): Flow<List<BookEntity>> {
+        return bookDao.getBooksByIds(bookIds)
+    }
 }

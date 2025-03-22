@@ -31,4 +31,7 @@ interface BookDao {
 
     @Update
     suspend fun updateBook(book: BookEntity)
+
+    @Query("SELECT * FROM books WHERE id IN (:bookIds)")
+    fun getBooksByIds(bookIds: List<Int>): Flow<List<BookEntity>>
 }

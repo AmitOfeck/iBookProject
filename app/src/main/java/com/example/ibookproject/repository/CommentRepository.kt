@@ -6,7 +6,7 @@ import com.example.ibookproject.data.entities.CommentEntity
 
 class CommentRepository(private val commentDao: CommentDao) {
 
-        fun getCommentsForBook(bookId: Int): LiveData<List<CommentEntity>> {
+    fun getCommentsForBook(bookId: Int): LiveData<List<CommentEntity>> {
         return commentDao.getCommentsForBook(bookId)
     }
 
@@ -16,5 +16,9 @@ class CommentRepository(private val commentDao: CommentDao) {
 
     suspend fun deleteComment(commentId: Int) {
         commentDao.deleteComment(commentId)
+    }
+
+     fun getCommentsByUserId(userId: String): LiveData<List<CommentEntity>> {
+        return commentDao.getCommentsByUserId(userId)
     }
 }
