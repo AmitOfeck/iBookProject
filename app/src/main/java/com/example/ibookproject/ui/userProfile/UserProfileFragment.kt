@@ -67,7 +67,7 @@ class UserProfileFragment : Fragment() {
             val bundle = Bundle().apply {
                 putInt("bookId", bookId)
             }
-            findNavController().navigate(R.id.action_editProfileFragment_to_userProfileFragment)
+            findNavController().navigate(R.id.action_userProfileFragment_to_bookDetailsFragment, bundle)
         })
         rvUserBooks.adapter = booksAdapter
 
