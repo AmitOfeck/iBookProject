@@ -61,7 +61,6 @@ class UserProfileFragment : Fragment() {
             findNavController().navigate(R.id.action_userProfileFragment_to_editProfileFragment)
         }
 
-
         rvUserBooks.layoutManager = LinearLayoutManager(requireContext())
         booksAdapter = BooksAdapter(uploadedBooks, { bookId ->
             val bundle = Bundle().apply {
@@ -94,6 +93,19 @@ class UserProfileFragment : Fragment() {
                     Glide.with(requireContext())
                         .load(user.profileImage)
                         .into(ivProfilePicture)
+                }
+            } else {
+                userViewModel.fetchUserFromRemoteAndCache(userId) // Just call it without a callback
+
+                userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
+                    if (firebaseUser != null) {
+                        tvUsername.text = firebaseUser.name
+                        tvUserBio.text = firebaseUser.bio
+
+                        Glide.with(requireContext())
+                            .load(firebaseUser.profileImage)
+                            .into(ivProfilePicture)
+                    }
                 }
             }
         }

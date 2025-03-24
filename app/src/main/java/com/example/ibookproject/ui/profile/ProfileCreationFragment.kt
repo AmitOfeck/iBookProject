@@ -5,21 +5,20 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.UserEntity
 import com.example.ibookproject.databinding.FragmentProfileCreationBinding
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
-import com.bumptech.glide.Glide
 
 class ProfileCreationFragment : Fragment() {
     private var _binding: FragmentProfileCreationBinding? = null
@@ -51,7 +50,6 @@ class ProfileCreationFragment : Fragment() {
             if (binding.checkboxThriller.isChecked) selectedGenres.add("Thriller")
 
             val genresString = selectedGenres.joinToString(",")
-
             val imageUri = selectedImageUri?.toString() ?: ""
 
             if (name.isEmpty()) {
@@ -62,19 +60,15 @@ class ProfileCreationFragment : Fragment() {
             val firebaseUser = FirebaseAuth.getInstance().currentUser
             val userId = firebaseUser?.uid ?: "UNKNOWN"
 
-            Log.d("ProfileCreationFragment", "Firebase UID: $userId")
-
             val user = UserEntity(userId, name, bio, genresString, imageUri)
+
             userViewModel.insertUser(user)
 
-            userViewModel.getUserById(userId).observe(viewLifecycleOwner) { savedUser ->
-                if (savedUser != null) {
-                    Log.d("ProfileCreationFragment", "User saved: $savedUser")
-                    Log.d("ProfileCreationFragment", "User Name: ${savedUser.name}")
-                    Log.d("ProfileCreationFragment", "User Bio: ${savedUser.bio}")
-                    Log.d("ProfileCreationFragment", "User Genres: ${savedUser.favoriteGenres}")
+            userViewModel.saveUserToRemote(user) { success ->
+                if (success) {
+                    Log.d("ProfileCreation", "User saved to Firestore")
                 } else {
-                    Log.e("ProfileCreationFragment", "User not found after saving")
+                    Log.e("ProfileCreation", "Failed to save user to Firestore")
                 }
             }
 
@@ -100,8 +94,8 @@ class ProfileCreationFragment : Fragment() {
             }
         }
 
-    private fun getUserId(context: Context): String {
-        val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
-        return sharedPref.getString("user_id", "default_user_id") ?: "default_user_id"
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
