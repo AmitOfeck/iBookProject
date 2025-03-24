@@ -1,11 +1,11 @@
-package com.example.ibookproject.repository
+package com.example.ibookproject.data.remote
 
 import com.example.ibookproject.data.entities.BookEntity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
 
-class FirebaseRepository {
+class BooksRemoteDataSource {
     private val db = FirebaseFirestore.getInstance()
     private val booksCollection = db.collection("books")
 

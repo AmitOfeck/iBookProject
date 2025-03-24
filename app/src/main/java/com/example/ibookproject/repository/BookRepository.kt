@@ -1,8 +1,8 @@
 package com.example.ibookproject.repository
 
-import androidx.annotation.Nullable
 import com.example.ibookproject.data.dao.BookDao
 import com.example.ibookproject.data.entities.BookEntity
+import com.example.ibookproject.data.remote.BooksRemoteDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -10,14 +10,15 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class BookRepository(private val bookDao: BookDao, private val firebaseRepository: FirebaseRepository) {
+class BookRepository(private val bookDao: BookDao) {
+    private val booksRemoteDataSource: BooksRemoteDataSource = BooksRemoteDataSource()
 
     fun getBookById(bookId: Int): Flow<BookEntity> = flow {
         val cachedBook = bookDao.getBookById(bookId).first()
         if (cachedBook != null) {
             emit(cachedBook)
         } else {
-            val bookFromFirebase = firebaseRepository.getBookFromFirebase(bookId)
+            val bookFromFirebase = booksRemoteDataSource.getBookFromFirebase(bookId)
             if (bookFromFirebase != null) {
                 bookDao.insertBook(bookFromFirebase)
                 emit(bookFromFirebase)
@@ -30,7 +31,7 @@ class BookRepository(private val bookDao: BookDao, private val firebaseRepositor
         if (cachedBooks.isNotEmpty()) {
             emit(cachedBooks)
         } else {
-            val booksFromFirebase = firebaseRepository.getAllBooksFromFirebase()
+            val booksFromFirebase = booksRemoteDataSource.getAllBooksFromFirebase()
             bookDao.insertBooks(booksFromFirebase)
             emit(booksFromFirebase)
         }
@@ -38,18 +39,18 @@ class BookRepository(private val bookDao: BookDao, private val firebaseRepositor
 
     suspend fun insertBook(book: BookEntity): Int {
         val bookId = bookDao.insertBook(book).toInt()
-        firebaseRepository.saveBookToFirebase(book)
+        booksRemoteDataSource.saveBookToFirebase(book)
         return bookId
     }
 
     suspend fun deleteBook(bookId: Int) {
         bookDao.deleteBook(bookId)
-        firebaseRepository.deleteBookFromFirebase(bookId)
+        booksRemoteDataSource.deleteBookFromFirebase(bookId)
     }
 
     suspend fun updateBook(book: BookEntity) {
         bookDao.updateBook(book)
-        firebaseRepository.saveBookToFirebase(book)
+        booksRemoteDataSource.saveBookToFirebase(book)
     }
 
 
@@ -59,7 +60,7 @@ class BookRepository(private val bookDao: BookDao, private val firebaseRepositor
         if (!localBooks.isNullOrEmpty()) {
             emit(localBooks)
         } else {
-            val firebaseBooks = firebaseRepository.getBooksByIds(bookIds)
+            val firebaseBooks = booksRemoteDataSource.getBooksByIds(bookIds)
             bookDao.insertBooks(firebaseBooks)
             emit(firebaseBooks)
         }
@@ -71,7 +72,7 @@ class BookRepository(private val bookDao: BookDao, private val firebaseRepositor
         if (!localBooks.isNullOrEmpty()) {
             emit(localBooks)
         } else {
-            val firebaseBooks = firebaseRepository.getBooksByUploadingUser(userId)
+            val firebaseBooks = booksRemoteDataSource.getBooksByUploadingUser(userId)
             bookDao.insertBooks(firebaseBooks)
             emit(firebaseBooks)
         }

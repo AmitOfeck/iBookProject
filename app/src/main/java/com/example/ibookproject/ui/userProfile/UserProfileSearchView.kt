@@ -9,11 +9,10 @@ import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.repository.BookRepository
 import com.example.ibookproject.repository.CommentRepository
-import com.example.ibookproject.repository.FirebaseRepository
+import com.example.ibookproject.data.remote.BooksRemoteDataSource
 
 class UserProfileSearchView(application: Application) : AndroidViewModel(application) {
-    private val firebaseRepository: FirebaseRepository = FirebaseRepository()
-    private val bookRepository: BookRepository = BookRepository(BookDatabase.getDatabase(application).bookDao(), firebaseRepository)
+    private val bookRepository: BookRepository = BookRepository(BookDatabase.getDatabase(application).bookDao())
     private val commentRepository: CommentRepository = CommentRepository(BookDatabase.getDatabase(application).commentDao())
 
     fun getBooksByUser(userId: String): LiveData<List<BookEntity>> {
