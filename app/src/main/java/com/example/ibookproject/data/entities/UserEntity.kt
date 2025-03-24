@@ -5,11 +5,11 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "users")
 data class UserEntity(
-    @PrimaryKey val userId: String,
-    val name: String,
-    val bio: String,
-    val favoriteGenres: String,
-    val profileImage: String?
+    @PrimaryKey val userId: String = "",
+    val name: String = "",
+    val bio: String = "",
+    val favoriteGenres: String = "",
+    val profileImage: String = ""
 ) {
 
     fun getGenresList(): List<String> {
