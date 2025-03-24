@@ -3,6 +3,7 @@ package com.example.ibookproject.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.ibookproject.data.entities.CommentEntity
 
@@ -19,4 +20,7 @@ interface CommentDao {
 
     @Query("SELECT * FROM comments WHERE userId = :userId")
     fun getCommentsByUserId(userId: String): LiveData<List<CommentEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertComments(comments: List<CommentEntity>)
 }

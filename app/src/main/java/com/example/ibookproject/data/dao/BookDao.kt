@@ -34,4 +34,7 @@ interface BookDao {
 
     @Query("SELECT * FROM books WHERE id IN (:bookIds)")
     fun getBooksByIds(bookIds: List<Int>): Flow<List<BookEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBooks(books: List<BookEntity>)
 }

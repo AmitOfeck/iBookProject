@@ -8,10 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.ibookproject.data.database.BookDatabase
 import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.repository.BookRepository
+import com.example.ibookproject.repository.FirebaseRepository
 import kotlinx.coroutines.launch
 
 class BookDetailsViewModel(application: Application) : AndroidViewModel(application)  {
-    private val bookRepository: BookRepository = BookRepository(BookDatabase.getDatabase(application).bookDao())
+    private val firebaseRepository: FirebaseRepository = FirebaseRepository()
+    private val bookRepository: BookRepository = BookRepository(BookDatabase.getDatabase(application).bookDao(), firebaseRepository)
 
     fun getBookById(bookId: Int): LiveData<BookEntity> {
         return bookRepository.getBookById(bookId).asLiveData()
