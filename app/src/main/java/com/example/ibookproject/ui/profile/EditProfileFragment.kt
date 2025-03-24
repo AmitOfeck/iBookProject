@@ -1,7 +1,6 @@
 package com.example.ibookproject.ui.profile
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -18,7 +17,6 @@ import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.UserEntity
 import com.example.ibookproject.databinding.FragmentEditProfileBinding
-import com.example.ibookproject.ui.profile.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -50,21 +48,32 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun loadUserData() {
-        val firebaseUser = FirebaseAuth.getInstance().currentUser
-        val userId = firebaseUser?.uid ?: return
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        userViewModel.getUserById(userId).observe(viewLifecycleOwner) { user ->
-            if (user != null) {
-                currentUser = user
-
-                binding.nameInput.setText(user.name)
-                binding.bioInput.setText(user.bio)
-                setSelectedGenres(user.favoriteGenres)
-
-                if (user.profileImage?.isNotEmpty() == true) {
-                    Glide.with(requireContext()).load(user.profileImage).into(binding.profileImage)
-                }
+        userViewModel.getUserById(userId).observe(viewLifecycleOwner) { localUser ->
+            if (localUser != null) {
+                currentUser = localUser
+                updateUI(localUser)
+            } else {
+                userViewModel.fetchUserFromRemoteAndCache(userId)
             }
+        }
+
+        userViewModel.userLiveData.observe(viewLifecycleOwner) { remoteUser ->
+            remoteUser?.let {
+                currentUser = it
+                updateUI(it)
+            }
+        }
+    }
+
+    private fun updateUI(user: UserEntity) {
+        binding.nameInput.setText(user.name)
+        binding.bioInput.setText(user.bio)
+        setSelectedGenres(user.favoriteGenres)
+
+        if (!user.profileImage.isNullOrEmpty()) {
+            Glide.with(requireContext()).load(user.profileImage).into(binding.profileImage)
         }
     }
 
@@ -86,7 +95,6 @@ class EditProfileFragment : Fragment() {
         if (binding.checkboxFantasy.isChecked) selectedGenres.add("Fantasy")
         if (binding.checkboxHorror.isChecked) selectedGenres.add("Horror")
         if (binding.checkboxThriller.isChecked) selectedGenres.add("Thriller")
-
         return selectedGenres.joinToString(",")
     }
 
@@ -110,9 +118,16 @@ class EditProfileFragment : Fragment() {
 
         lifecycleScope.launch {
             userViewModel.updateUser(updatedUser)
-            Toast.makeText(requireContext(), "פרטים נשמרו!", Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.action_editProfileFragment_to_userProfileFragment)
         }
+
+        userViewModel.saveUserToRemote(updatedUser) { success ->
+            if (!success) {
+                Toast.makeText(requireContext(), "שגיאה בשמירה לשרת", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        Toast.makeText(requireContext(), "פרטים נשמרו!", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.action_editProfileFragment_to_userProfileFragment)
     }
 
     private fun openGallery() {
