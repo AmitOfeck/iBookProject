@@ -64,6 +64,12 @@ class MainActivity : AppCompatActivity() {
                     }
                     true
                 }
+                R.id.nav_dashboard_button -> {
+                    if (navController.currentDestination?.id != R.id.dashboardFragment) {
+                        navController.navigate(R.id.dashboardFragment)
+                    }
+                    true
+                }
                 else -> false
             }
         }
@@ -75,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
         if (userId != null) {
             // If there is a user_id, user is logged in. Navigate to dashboard
-            navController.navigate(R.id.dashboardFragment)
+            navController.navigate(R.id.searchBookFragment)
         } else {
             // If there is no user_id, user is not logged in. Navigate to login screen
             navController.navigate(R.id.loginFragment)

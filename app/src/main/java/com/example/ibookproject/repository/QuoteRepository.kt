@@ -9,7 +9,7 @@ import kotlinx.coroutines.awaitAll
 
 class QuoteRepository(private val api: QuoteApiService) {
 
-    suspend fun getRandomQuotes(count: Int = 4): List<Quote> = coroutineScope {
+    suspend fun getRandomQuotes(count: Int = 7): List<Quote> = coroutineScope {
         val quoteRequests = mutableListOf<Deferred<Quote>>()
 
         for (i in 1..count) {

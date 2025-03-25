@@ -28,7 +28,7 @@ class QuoteViewModel : ViewModel() {
     fun loadQuotes() {
         viewModelScope.launch {
             try {
-                val randomQuotes = quoteRepository.getRandomQuotes()
+                val randomQuotes = quoteRepository.getRandomQuotes(7)
                 _quotes.postValue(randomQuotes)
             } catch (e: Exception) {
                 Log.e("QuoteViewModel", "Error: ${e.message}", e)

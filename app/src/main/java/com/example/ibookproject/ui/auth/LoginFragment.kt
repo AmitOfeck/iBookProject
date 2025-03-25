@@ -57,7 +57,7 @@ class LoginFragment : Fragment() {
                         activity?.invalidateOptionsMenu()
 
                         Toast.makeText(requireContext(), "התחברת בהצלחה!", Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.action_loginFragment_to_dashboardFragment)
+                        findNavController().navigate(R.id.action_loginFragment_to_searchFragment)
                     } else {
                         Toast.makeText(requireContext(), "שגיאה: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                     }
