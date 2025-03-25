@@ -13,12 +13,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.UserEntity
 import com.example.ibookproject.databinding.FragmentEditProfileBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
+import java.util.*
 
 class EditProfileFragment : Fragment() {
     private var _binding: FragmentEditProfileBinding? = null
@@ -27,6 +29,7 @@ class EditProfileFragment : Fragment() {
 
     private lateinit var userViewModel: UserViewModel
     private var currentUser: UserEntity? = null
+    private val storage = FirebaseStorage.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,7 +76,13 @@ class EditProfileFragment : Fragment() {
         setSelectedGenres(user.favoriteGenres)
 
         if (!user.profileImage.isNullOrEmpty()) {
-            Glide.with(requireContext()).load(user.profileImage).into(binding.profileImage)
+            Picasso.get()
+                .load(user.profileImage)
+                .placeholder(R.drawable.ic_profile)
+                .error(R.drawable.ic_profile)
+                .fit()
+                .centerCrop()
+                .into(binding.profileImage)
         }
     }
 
@@ -102,18 +111,42 @@ class EditProfileFragment : Fragment() {
         val name = binding.nameInput.text.toString().trim()
         val bio = binding.bioInput.text.toString().trim()
         val genres = getSelectedGenres()
-        val imageUri = selectedImageUri?.toString() ?: currentUser?.profileImage ?: ""
 
         if (name.isEmpty()) {
             Toast.makeText(requireContext(), "שם לא יכול להיות ריק", Toast.LENGTH_SHORT).show()
             return
         }
 
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        if (selectedImageUri != null) {
+            val imageRef = storage.reference.child("images/profile/$userId.jpg")
+            imageRef.putFile(selectedImageUri!!)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl.addOnSuccessListener { uri ->
+                        updateUserWithImage(userId, name, bio, genres, uri.toString())
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "שגיאה בהעלאת תמונה", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            updateUserWithImage(userId, name, bio, genres, currentUser?.profileImage ?: "")
+        }
+    }
+
+    private fun updateUserWithImage(
+        userId: String,
+        name: String,
+        bio: String,
+        genres: String,
+        imageUrl: String
+    ) {
         val updatedUser = currentUser?.copy(
             name = name,
             bio = bio,
             favoriteGenres = genres,
-            profileImage = imageUri
+            profileImage = imageUrl
         ) ?: return
 
         lifecycleScope.launch {
@@ -139,8 +172,12 @@ class EditProfileFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 selectedImageUri = result.data?.data
-                Glide.with(requireContext())
+                Picasso.get()
                     .load(selectedImageUri)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .fit()
+                    .centerCrop()
                     .into(binding.profileImage)
             }
         }
