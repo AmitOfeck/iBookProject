@@ -134,7 +134,9 @@ class UserProfileFragment : Fragment() {
             booksAdapter.updateBooks(uploadedBooks)
         }
 
-        userProfileSearchView.getCommentsByUser(userId).observe(viewLifecycleOwner) { comments ->
+        userProfileSearchView.getCommentsByUser(userId)
+
+        userProfileSearchView.comments.observe(viewLifecycleOwner) { comments ->
             val bookIds = comments.map { it.bookId }
             userProfileSearchView.getBooksById(bookIds).observe(viewLifecycleOwner) { books ->
                 commentedBooks = books.toMutableList()

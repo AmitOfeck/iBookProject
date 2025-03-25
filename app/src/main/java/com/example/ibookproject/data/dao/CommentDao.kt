@@ -15,12 +15,18 @@ interface CommentDao {
     @Query("SELECT * FROM comments WHERE bookId = :bookId")
     fun getCommentsForBook(bookId: Int): LiveData<List<CommentEntity>>
 
-    @Query("DELETE FROM comments WHERE id = :commentId")
-    suspend fun deleteComment(commentId: Int)
+    @Query("DELETE FROM comments WHERE bookId = :bookId")
+    suspend fun deleteCommentsForBook(bookId: Int)
 
     @Query("SELECT * FROM comments WHERE userId = :userId")
     fun getCommentsByUserId(userId: String): LiveData<List<CommentEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertComments(comments: List<CommentEntity>)
+    @Query("SELECT * FROM comments WHERE bookId = :bookId ORDER BY lastUpdated DESC LIMIT 1")
+    suspend fun getLatestCommentForBook(bookId: Int): CommentEntity?
+
+    @Query("SELECT * FROM comments WHERE userId = :userId ORDER BY lastUpdated DESC LIMIT 1")
+    suspend fun getLatestCommentByUserId(userId: String): CommentEntity?
+
+    @Query("DELETE FROM comments WHERE userId = :userId")
+    suspend fun deleteCommentsByUserId(userId: String)
 }

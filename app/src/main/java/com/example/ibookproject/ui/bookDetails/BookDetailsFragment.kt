@@ -82,7 +82,9 @@ class BookDetailsFragment : Fragment() {
             }
         }
 
-        commentViewModel.getCommentsForBook(bookId).observe(viewLifecycleOwner) { comments ->
+        commentViewModel.getCommentsForBook(bookId)
+
+        commentViewModel.comments.observe(viewLifecycleOwner) { comments ->
             val userNamesMap = mutableMapOf<String, String>()
 
             comments.forEach { comment ->

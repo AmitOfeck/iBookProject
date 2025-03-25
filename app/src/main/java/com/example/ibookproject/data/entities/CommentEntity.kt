@@ -9,5 +9,6 @@ data class CommentEntity(
     val bookId: Int,
     val userId: String,
     val comment: String,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    var lastUpdated: Long = System.currentTimeMillis()
 )
