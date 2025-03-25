@@ -12,6 +12,8 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.ibookproject.R
@@ -19,8 +21,9 @@ import com.example.ibookproject.Utils
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.data.entities.RatingEntity
 import com.example.ibookproject.ui.comment.CommentViewModel
-import com.example.ibookproject.ui.profile.UserViewModel
 import com.example.ibookproject.ui.rating.RatingViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class BookDetailsFragment : Fragment() {
 
@@ -43,7 +46,6 @@ class BookDetailsFragment : Fragment() {
     private val bookViewModel: BookDetailsViewModel by activityViewModels()
     private val ratingViewModel: RatingViewModel by activityViewModels()
     private val commentViewModel: CommentViewModel by activityViewModels()
-    private val userViewModel: UserViewModel by activityViewModels()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -75,53 +77,23 @@ class BookDetailsFragment : Fragment() {
             ratingBar.rating = avgRating ?: 0f
         }
 
-        ratingViewModel.getUserRatingForBook(userId,bookId).observe(viewLifecycleOwner) { userRating ->
+        ratingViewModel.getUserRatingForBook(userId, bookId).observe(viewLifecycleOwner) { userRating ->
             userRating?.let {
                 userRatingBar.rating = it.rating
                 userBookRating = it
             }
         }
 
-        commentViewModel.getCommentsForBook(bookId)
-
-        commentViewModel.comments.observe(viewLifecycleOwner) { comments ->
-            val userNamesMap = mutableMapOf<String, String>()
-
-            comments.forEach { comment ->
-                userViewModel.getUserById(comment.userId).observe(viewLifecycleOwner) { user ->
-                    userNamesMap[comment.userId] = user?.name ?: "unknown user"
-                    tvComments.text = comments.joinToString("\n") {
-                        "${userNamesMap[it.userId] ?: "loading..."}: ${it.comment}"
-                    }
+        viewLifecycleOwner.lifecycleScope.launch {
+            commentViewModel.getCommentsForBook(bookId).collect { comments ->
+                val commentList: List<CommentEntity> = comments
+                tvComments.text = commentList.joinToString("\n") {
+                    "${it.userId}: ${it.comment}"
                 }
             }
         }
 
         setupListeners()
-
-        bookId.let { bookId ->
-            bookViewModel.getBookById(bookId).observe(viewLifecycleOwner) { book ->
-                val comments = emptyList<String>()
-
-                tvBookTitle.text = book.title
-                tvBookAuthor.text = "by ${book.author}"
-                tvBookDescription.text = "description ${book.description}"
-                ratingBar.rating = book.rating
-                tvComments.text = comments.joinToString("\n")
-
-                if (userId == book.uploadingUserId) {
-                    btnEditBook.visibility = View.VISIBLE
-                    btnDeleteBook.visibility = View.VISIBLE
-                } else {
-                    btnEditBook.visibility = View.GONE
-                    btnDeleteBook.visibility = View.GONE
-                }
-
-                Glide.with(requireContext())
-                    .load(book.coverImage)
-                    .into(ivBookCover)
-            }
-        }
 
         return view
     }
@@ -131,11 +103,10 @@ class BookDetailsFragment : Fragment() {
             val userRating = userRatingBar.rating
 
             val rating = RatingEntity(bookId = bookId, userId = userId, rating = userRating)
-            if (userBookRating != null){
+            if (userBookRating != null) {
                 rating.id = userBookRating!!.id
                 ratingViewModel.updateRating(rating)
-            }
-            else{
+            } else {
                 ratingViewModel.addRating(rating)
             }
         }

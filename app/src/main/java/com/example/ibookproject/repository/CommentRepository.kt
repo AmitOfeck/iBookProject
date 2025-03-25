@@ -1,21 +1,23 @@
 package com.example.ibookproject.repository
 
-import androidx.lifecycle.LiveData
 import com.example.ibookproject.data.dao.CommentDao
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.data.remote.CommentsRemoteDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
 class CommentRepository(private val commentDao: CommentDao) {
     private val commentsRemoteDataSource: CommentsRemoteDataSource = CommentsRemoteDataSource()
 
     private val cacheValidityTime = 10 * 1000
 
-    suspend fun getCommentsForBook(bookId: Int): LiveData<List<CommentEntity>> {
+    suspend fun getCommentsForBook(bookId: Int): Flow<List<CommentEntity>> = flow {
         val cachedComment = commentDao.getLatestCommentForBook(bookId)
         val currentTime = System.currentTimeMillis()
 
         if (cachedComment != null && currentTime - cachedComment.lastUpdated < cacheValidityTime) {
-            return commentDao.getCommentsForBook(bookId)
+            emit(commentDao.getCommentsForBook(bookId).first())
         } else {
             val remoteComments = commentsRemoteDataSource.getCommentsForBook(bookId)
 
@@ -26,7 +28,7 @@ class CommentRepository(private val commentDao: CommentDao) {
                 commentDao.insertComment(it)
             }
 
-            return commentDao.getCommentsForBook(bookId)
+            emit(commentDao.getCommentsForBook(bookId).first())
         }
     }
 
@@ -35,9 +37,10 @@ class CommentRepository(private val commentDao: CommentDao) {
         commentDao.insertComment(comment)
     }
 
-    suspend fun getCommentsByUserId(userId: String): LiveData<List<CommentEntity>> {
+    suspend fun getCommentsByUserId(userId: String): Flow<List<CommentEntity>> = flow {
         val cachedComment = commentDao.getLatestCommentByUserId(userId)
         val currentTime = System.currentTimeMillis()
+
         if (cachedComment != null && currentTime - cachedComment.lastUpdated > cacheValidityTime) {
             val remoteComments = commentsRemoteDataSource.getCommentsByUserId(userId)
             commentDao.deleteCommentsByUserId(userId)
@@ -48,6 +51,6 @@ class CommentRepository(private val commentDao: CommentDao) {
             }
         }
 
-        return commentDao.getCommentsByUserId(userId)
+        emit(commentDao.getCommentsByUserId(userId).first())
     }
 }

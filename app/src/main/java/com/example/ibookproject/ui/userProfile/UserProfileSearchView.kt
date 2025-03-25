@@ -25,13 +25,13 @@ class UserProfileSearchView(application: Application) : AndroidViewModel(applica
         return bookRepository.getBooksByUploadingUser(userId).asLiveData()
     }
 
-    fun getCommentsByUser(userId: String){
-        viewModelScope.launch {
-            commentRepository.getCommentsByUserId(userId).observeForever { commentList ->
-                _comments.value = commentList ?: emptyList()
-            }
-        }
-    }
+//    fun getCommentsByUser(userId: String){
+//        viewModelScope.launch {
+//            commentRepository.getCommentsByUserId(userId).observeForever { commentList ->
+//                _comments.value = commentList ?: emptyList()
+//            }
+//        }
+//    }
 
 
     fun getBooksById(bookIds: List<Int>): LiveData<List<BookEntity>> {
