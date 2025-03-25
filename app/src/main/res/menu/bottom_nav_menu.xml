@@ -20,4 +20,10 @@
         android:title="Profile"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/nav_dashboard_button"
+        android:icon="@drawable/ic_inspiration"
+        android:title="Inspirition"
+        app:showAsAction="ifRoom"/>
+
 </menu>

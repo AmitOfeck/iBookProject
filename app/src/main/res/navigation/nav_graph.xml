@@ -16,6 +16,10 @@
             app:destination="@id/registrationFragment"/>
 
         <action
+            android:id="@+id/action_loginFragment_to_searchFragment"
+            app:destination="@id/searchBookFragment"/>
+
+        <action
             android:id="@+id/action_loginFragment_to_dashboardFragment"
             app:destination="@id/dashboardFragment"/>
     </fragment>
