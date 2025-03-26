@@ -29,7 +29,7 @@ class CommentViewModel(application: Application) : AndroidViewModel(application)
     fun addComment(comment: CommentEntity) {
         viewModelScope.launch {
             commentRepository.addComment(comment)
-            getCommentsForBook(comment.bookId) // טעינת התגובות מחדש לאחר ההוספה
+            getCommentsForBook(comment.bookId)
         }
     }
 }

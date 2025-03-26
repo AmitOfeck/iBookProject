@@ -9,5 +9,6 @@ data class RatingEntity(
     val bookId: Int,
     val userId: String,
     val rating: Float,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    var lastUpdated: Long = System.currentTimeMillis()
 )

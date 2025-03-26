@@ -1,24 +1,31 @@
 package com.example.ibookproject.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.ibookproject.data.entities.RatingEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RatingDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRating(rating: RatingEntity)
 
     @Update
     suspend fun updateRating(rating: RatingEntity)
 
-    @Query("SELECT * FROM ratings WHERE bookId = :bookId AND userId = :userId")
-    fun getUserRatingForBook(userId:String, bookId: Int): LiveData<RatingEntity>
+    @Query("SELECT * FROM ratings WHERE bookId = :bookId AND userId = :userId LIMIT 1")
+    fun getUserRatingForBook(userId: String, bookId: Int): RatingEntity?
 
     @Query("SELECT AVG(rating) FROM ratings WHERE bookId = :bookId")
-    fun getAverageRating(bookId: Int): LiveData<Float>
+    suspend fun getAverageRating(bookId: Int): Float?
+
+    @Query("DELETE FROM ratings")
+    suspend fun clearRatings()
+
+    @Query("SELECT MAX(lastUpdated) FROM ratings WHERE bookId = :bookId")
+    suspend fun getLastUpdatedForBook(bookId: Int): Long?
 }

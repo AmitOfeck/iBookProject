@@ -75,14 +75,26 @@ class BookDetailsFragment : Fragment() {
         btnEditBook = view.findViewById(R.id.btnEditBook)
         btnDeleteBook = view.findViewById(R.id.btnDeleteBook)
 
-        ratingViewModel.getAverageRating(bookId).observe(viewLifecycleOwner) { avgRating ->
-            ratingBar.rating = avgRating ?: 0f
+        resetScreen()
+
+        ratingViewModel.getAverageRating(bookId)
+
+        lifecycleScope.launch {
+            ratingViewModel.AVGrating.collect() { avg ->
+                avg?.let {
+                    ratingBar.rating = avg
+                }
+            }
         }
 
-        ratingViewModel.getUserRatingForBook(userId, bookId).observe(viewLifecycleOwner) { userRating ->
-            userRating?.let {
-                userRatingBar.rating = it.rating
-                userBookRating = it
+        ratingViewModel.getUserRatingForBook(userId, bookId)
+
+        lifecycleScope.launch {
+            ratingViewModel.userRating.collect() { userRating ->
+                userRating?.let {
+                    userRatingBar.rating = userRating.rating
+                    userBookRating = userRating
+                }
             }
         }
 
@@ -107,6 +119,14 @@ class BookDetailsFragment : Fragment() {
         setupListeners()
 
         return view
+    }
+
+    private fun resetScreen() {
+        userRatingBar.rating = 0f
+        ratingBar.rating = 0f
+        tvComments.text = ""
+        etComment.text.clear()
+        userBookRating = null
     }
 
     private fun setupListeners() {
