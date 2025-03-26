@@ -12,13 +12,13 @@ interface CommentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertComment(comment: CommentEntity)
 
-    @Query("SELECT * FROM comments WHERE bookId = :bookId")
+    @Query("SELECT * FROM comments WHERE bookId = :bookId  ORDER BY timestamp DESC")
     fun getCommentsForBook(bookId: Int): Flow<List<CommentEntity>>
 
     @Query("DELETE FROM comments WHERE bookId = :bookId")
     suspend fun deleteCommentsForBook(bookId: Int)
 
-    @Query("SELECT * FROM comments WHERE userId = :userId")
+    @Query("SELECT * FROM comments WHERE userId = :userId  ORDER BY timestamp DESC")
     fun getCommentsByUserId(userId: String): Flow<List<CommentEntity>>
 
     @Query("SELECT * FROM comments WHERE bookId = :bookId ORDER BY lastUpdated DESC LIMIT 1")
