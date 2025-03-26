@@ -21,6 +21,7 @@ import com.example.ibookproject.Utils
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.data.entities.RatingEntity
 import com.example.ibookproject.ui.comment.CommentViewModel
+import com.example.ibookproject.ui.profile.UserViewModel
 import com.example.ibookproject.ui.rating.RatingViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ class BookDetailsFragment : Fragment() {
     private val bookViewModel: BookDetailsViewModel by activityViewModels()
     private val ratingViewModel: RatingViewModel by activityViewModels()
     private val commentViewModel: CommentViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -84,11 +86,20 @@ class BookDetailsFragment : Fragment() {
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            commentViewModel.getCommentsForBook(bookId).collect { comments ->
-                val commentList: List<CommentEntity> = comments
-                tvComments.text = commentList.joinToString("\n") {
-                    "${it.userId}: ${it.comment}"
+        commentViewModel.getCommentsForBook(bookId)
+
+        lifecycleScope.launch {
+            commentViewModel.comments.collect { comments ->
+
+                val userNamesMap = mutableMapOf<String, String>()
+
+                comments.forEach { comment ->
+                    userViewModel.getUserById(comment.userId).observe(viewLifecycleOwner) { user ->
+                        userNamesMap[comment.userId] = user?.name ?: "unknown user"
+                        tvComments.text = comments.joinToString("\n") {
+                            "${userNamesMap[it.userId] ?: "loading..."}: ${it.comment}"
+                        }
+                    }
                 }
             }
         }

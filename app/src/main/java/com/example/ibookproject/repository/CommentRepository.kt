@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.flow
 class CommentRepository(private val commentDao: CommentDao) {
     private val commentsRemoteDataSource: CommentsRemoteDataSource = CommentsRemoteDataSource()
 
-    private val cacheValidityTime = 10 * 1000
+    private val cacheValidityTime = 60 * 1000
 
-    suspend fun getCommentsForBook(bookId: Int): Flow<List<CommentEntity>> = flow {
+     fun getCommentsForBook(bookId: Int): Flow<List<CommentEntity>> = flow {
         val cachedComment = commentDao.getLatestCommentForBook(bookId)
         val currentTime = System.currentTimeMillis()
 
@@ -37,7 +37,7 @@ class CommentRepository(private val commentDao: CommentDao) {
         commentDao.insertComment(comment)
     }
 
-    suspend fun getCommentsByUserId(userId: String): Flow<List<CommentEntity>> = flow {
+    fun getCommentsByUserId(userId: String): Flow<List<CommentEntity>> = flow {
         val cachedComment = commentDao.getLatestCommentByUserId(userId)
         val currentTime = System.currentTimeMillis()
 
