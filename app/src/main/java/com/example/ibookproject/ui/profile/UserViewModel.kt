@@ -1,14 +1,14 @@
 package com.example.ibookproject.ui.profile
 
+import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.*
+import com.example.ibookproject.data.database.UserDatabase
 import com.example.ibookproject.data.entities.UserEntity
+import com.example.ibookproject.data.remote.UserRemoteDataSource
 import com.example.ibookproject.data.repository.UserRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import android.app.Application
-import com.example.ibookproject.data.database.UserDatabase
-import com.example.ibookproject.data.remote.UserRemoteDataSource
-
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -56,5 +56,9 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-}
 
+
+    fun uploadImage(imageUri: Uri, storagePath: String, onResult: (String?) -> Unit) {
+        userRepository.uploadImage(imageUri, storagePath, onResult)
+    }
+}

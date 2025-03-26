@@ -1,24 +1,21 @@
 package com.example.ibookproject.ui.profile
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.UserEntity
 import com.example.ibookproject.databinding.FragmentProfileCreationBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.squareup.picasso.Picasso
 
 class ProfileCreationFragment : Fragment() {
     private var _binding: FragmentProfileCreationBinding? = null
@@ -50,33 +47,44 @@ class ProfileCreationFragment : Fragment() {
             if (binding.checkboxThriller.isChecked) selectedGenres.add("Thriller")
 
             val genresString = selectedGenres.joinToString(",")
-            val imageUri = selectedImageUri?.toString() ?: ""
 
             if (name.isEmpty()) {
                 Toast.makeText(requireContext(), "שם לא יכול להיות ריק", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val firebaseUser = FirebaseAuth.getInstance().currentUser
-            val userId = firebaseUser?.uid ?: "UNKNOWN"
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
 
-            val user = UserEntity(userId, name, bio, genresString, imageUri)
-
-            userViewModel.insertUser(user)
-
-            userViewModel.saveUserToRemote(user) { success ->
-                if (success) {
-                    Log.d("ProfileCreation", "User saved to Firestore")
-                } else {
-                    Log.e("ProfileCreation", "Failed to save user to Firestore")
+            if (selectedImageUri != null) {
+                val path = "images/profile/$userId.jpg"
+                userViewModel.uploadImage(selectedImageUri!!, path) { imageUrl ->
+                    if (imageUrl != null) {
+                        saveUserProfile(userId, name, bio, genresString, imageUrl)
+                    } else {
+                        Toast.makeText(requireContext(), "שגיאה בהעלאת תמונה", Toast.LENGTH_SHORT).show()
+                    }
                 }
+            } else {
+                saveUserProfile(userId, name, bio, genresString, "")
             }
-
-            Toast.makeText(requireContext(), "פרופיל נשמר!", Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.action_profileCreationFragment_to_loginFragment)
         }
 
         return binding.root
+    }
+
+    private fun saveUserProfile(userId: String, name: String, bio: String, genres: String, imageUrl: String) {
+        val user = UserEntity(userId, name, bio, genres, imageUrl)
+
+        userViewModel.insertUser(user)
+        userViewModel.saveUserToRemote(user) { success ->
+            if (success) {
+                Log.d("ProfileCreation", "User saved to Firestore")
+                Toast.makeText(requireContext(), "פרופיל נשמר!", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_profileCreationFragment_to_loginFragment)
+            } else {
+                Toast.makeText(requireContext(), "שגיאה בשמירת פרופיל", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun openGallery() {
@@ -88,8 +96,9 @@ class ProfileCreationFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 selectedImageUri = result.data?.data
-                Glide.with(requireContext())
+                Picasso.get()
                     .load(selectedImageUri)
+                    .placeholder(R.drawable.ic_profile)
                     .into(binding.profileImage)
             }
         }

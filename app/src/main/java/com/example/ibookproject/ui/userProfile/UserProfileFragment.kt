@@ -17,11 +17,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.book.BooksAdapter
 import com.example.ibookproject.ui.profile.UserViewModel
+import com.squareup.picasso.Picasso
 
 class UserProfileFragment : Fragment() {
 
@@ -62,12 +62,12 @@ class UserProfileFragment : Fragment() {
         }
 
         rvUserBooks.layoutManager = LinearLayoutManager(requireContext())
-        booksAdapter = BooksAdapter(uploadedBooks, { bookId ->
+        booksAdapter = BooksAdapter(uploadedBooks) { bookId ->
             val bundle = Bundle().apply {
                 putInt("bookId", bookId)
             }
             findNavController().navigate(R.id.action_userProfileFragment_to_bookDetailsFragment, bundle)
-        })
+        }
         rvUserBooks.adapter = booksAdapter
 
         tvCommentsSection.setOnClickListener {
@@ -89,21 +89,27 @@ class UserProfileFragment : Fragment() {
 
                 Log.d("UserProfileFragment", "Profile Image URI: ${user.profileImage}")
 
-                if (!user.profileImage.isNullOrEmpty()) {
-                    Glide.with(requireContext())
-                        .load(user.profileImage)
-                        .into(ivProfilePicture)
-                }
+                Picasso.get()
+                    .load(user.profileImage)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .fit()
+                    .centerCrop()
+                    .into(ivProfilePicture)
             } else {
-                userViewModel.fetchUserFromRemoteAndCache(userId) // Just call it without a callback
+                userViewModel.fetchUserFromRemoteAndCache(userId)
 
                 userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
                     if (firebaseUser != null) {
                         tvUsername.text = firebaseUser.name
                         tvUserBio.text = firebaseUser.bio
 
-                        Glide.with(requireContext())
+                        Picasso.get()
                             .load(firebaseUser.profileImage)
+                            .placeholder(R.drawable.ic_profile)
+                            .error(R.drawable.ic_profile)
+                            .fit()
+                            .centerCrop()
                             .into(ivProfilePicture)
                     }
                 }
