@@ -38,6 +38,7 @@ class AddBookFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): ScrollView? {
+        addBookViewModel.resetBookId()
         val userId = Utils.getUserId(requireContext()) ?: ""
         if (userId == "") {
             findNavController().navigate(R.id.loginFragment)
@@ -113,6 +114,7 @@ class AddBookFragment : Fragment() {
                     val bundle = Bundle().apply {
                         putString("bookId", bookId)
                     }
+
                     findNavController().navigate(R.id.action_addBookFragment_to_bookDetailsFragment, bundle)
                 }
             }

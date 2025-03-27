@@ -59,6 +59,7 @@ class BookDetailsFragment : Fragment() {
             findNavController().navigate(R.id.loginFragment)
             return null
         }
+
         val view = inflater.inflate(R.layout.fragment_book_details, container, false)
 
         tvBookTitle = view.findViewById(R.id.tvBookTitle)
