@@ -128,7 +128,6 @@ class BookDetailsFragment : Fragment() {
         lifecycleScope.launch {
             ratingViewModel.userRating.collect() { userRating ->
                 userRating?.let {
-                    println("RATING GOT HEREEEE +$userRating")
                     userRatingBar.rating = userRating.rating
                     userBookRating = userRating
                 }
@@ -165,6 +164,7 @@ class BookDetailsFragment : Fragment() {
         tvComments.text = ""
         etComment.text.clear()
         ratingViewModel.resetUserRatingForBook()
+        commentViewModel.resetComments()
     }
 
     private fun setupListeners() {

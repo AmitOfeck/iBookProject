@@ -87,16 +87,6 @@ class UserProfileFragment : Fragment() {
                 tvUsername.text = user.name
                 tvUserBio.text = user.bio
                 loadProfileImg(user.profileImage)
-            } else {
-                userViewModel.fetchUserFromRemoteAndCache(userId)
-
-                userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
-                    if (firebaseUser != null) {
-                        tvUsername.text = firebaseUser.name
-                        tvUserBio.text = firebaseUser.bio
-                        loadProfileImg(firebaseUser.profileImage)
-                    }
-                }
             }
         }
 

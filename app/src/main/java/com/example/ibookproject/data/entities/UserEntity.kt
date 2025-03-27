@@ -9,8 +9,8 @@ data class UserEntity(
     val name: String = "",
     val bio: String = "",
     val favoriteGenres: String = "",
-    val profileImage: String = ""
-) {
+    val profileImage: String = "",
+    var lastUpdated: Long = System.currentTimeMillis()) {
 
     fun getGenresList(): List<String> {
         return favoriteGenres.split(",").map { it.trim() }

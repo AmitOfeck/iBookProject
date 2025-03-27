@@ -37,28 +37,13 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getUserById(userId: String): LiveData<UserEntity?> {
-        return userRepository.getUserById(userId).asLiveData()
+     fun getUserById(userId: String): LiveData<UserEntity?> {
+         return userRepository.getUserById(userId).asLiveData()
     }
 
     fun saveUserToRemote(user: UserEntity, onResult: (Boolean) -> Unit) {
         userRepository.saveUserToRemote(user, onResult)
     }
-
-    fun fetchUserFromRemoteAndCache(userId: String) {
-        userRepository.fetchUserFromRemote(userId) { remoteUser ->
-            if (remoteUser != null) {
-                _userLiveData.postValue(remoteUser)
-
-                viewModelScope.launch {
-                    userRepository.insertUser(remoteUser)
-                }
-            } else {
-                _userLiveData.postValue(null)
-            }
-        }
-    }
-
 
     fun uploadImage(imageUri: Uri, storagePath: String, onResult: (String?) -> Unit) {
         uploadImageRepository.uploadImage(imageUri, storagePath, onResult)

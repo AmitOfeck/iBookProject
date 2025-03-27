@@ -57,8 +57,6 @@ class EditProfileFragment : Fragment() {
             if (localUser != null) {
                 currentUser = localUser
                 updateUI(localUser)
-            } else {
-                userViewModel.fetchUserFromRemoteAndCache(userId)
             }
         }
 

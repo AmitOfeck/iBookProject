@@ -32,4 +32,8 @@ class CommentViewModel(application: Application) : AndroidViewModel(application)
             getCommentsForBook(comment.bookId)
         }
     }
+
+    fun resetComments() {
+        _comments.value = emptyList()
+    }
 }
