@@ -21,19 +21,19 @@ interface BookDao {
     fun getBooksByUserId(userId: String): Flow<List<BookEntity>>
 
     @Query("SELECT * FROM books WHERE id = :bookId")
-    fun getBookById(bookId: Int): Flow<BookEntity>
+    fun getBookById(bookId: String): Flow<BookEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBook(book: BookEntity) : Long
 
     @Query("DELETE FROM books WHERE id = :bookId")
-    suspend fun deleteBook(bookId: Int)
+    suspend fun deleteBook(bookId: String)
 
     @Update
     suspend fun updateBook(book: BookEntity)
 
     @Query("SELECT * FROM books WHERE id IN (:bookIds)")
-    fun getBooksByIds(bookIds: List<Int>): Flow<List<BookEntity>>
+    fun getBooksByIds(bookIds: List<String>): Flow<List<BookEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBooks(books: List<BookEntity>)

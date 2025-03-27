@@ -36,7 +36,7 @@ class BookDetailsFragment : Fragment() {
     private lateinit var etComment: EditText
     private lateinit var btnPostComment: Button
     private lateinit var ivBookCover: ImageView
-    private var bookId: Int = -1
+    private var bookId: String = ""
     private lateinit var userId: String
     private var userBookRating: RatingEntity? = null
     private lateinit var btnEditBook: Button
@@ -52,9 +52,9 @@ class BookDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        bookId = arguments?.getInt("bookId") ?: -1
+        bookId = arguments?.getString("bookId") ?: ""
         userId = Utils.getUserId(requireContext()) ?: ""
-        if (bookId == -1 || userId == "") {
+        if (bookId == "" || userId == "") {
             findNavController().navigate(R.id.loginFragment)
             return null
         }
@@ -75,7 +75,7 @@ class BookDetailsFragment : Fragment() {
 
         resetScreen()
 
-        if (bookId == -1) {
+        if (bookId == "") {
             findNavController().popBackStack()
             return view
         }
@@ -188,7 +188,7 @@ class BookDetailsFragment : Fragment() {
         }
 
         btnEditBook.setOnClickListener {
-            val bundle = Bundle().apply { putInt("bookId", bookId) }
+            val bundle = Bundle().apply { putString("bookId", bookId) }
             findNavController().navigate(R.id.action_bookDetailsFragment_to_editBookFragment, bundle)
         }
 

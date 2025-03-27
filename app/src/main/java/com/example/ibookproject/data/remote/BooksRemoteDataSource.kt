@@ -9,7 +9,7 @@ class BooksRemoteDataSource {
     private val db = FirebaseFirestore.getInstance()
     private val booksCollection = db.collection("books")
 
-    suspend fun getBookFromFirebase(bookId: Int): BookEntity? {
+    suspend fun getBookFromFirebase(bookId: String): BookEntity? {
         return try {
             val document = booksCollection.document(bookId.toString()).get().await()
             document.toObject(BookEntity::class.java)
@@ -19,7 +19,7 @@ class BooksRemoteDataSource {
     }
 
     // Get books by list of IDs from Firebase
-    suspend fun getBooksByIds(bookIds: List<Int>): List<BookEntity> {
+    suspend fun getBooksByIds(bookIds: List<String>): List<BookEntity> {
         return try {
             val snapshot = booksCollection.whereIn("id", bookIds).get().await()
             snapshot.toObjects(BookEntity::class.java)
@@ -39,7 +39,7 @@ class BooksRemoteDataSource {
     }
 
     suspend fun saveBookToFirebase(book: BookEntity): Boolean {
-        val documentRef = booksCollection.document(book.id.toString())
+        val documentRef = booksCollection.document(book.id)
         val documentSnapshot = documentRef.get().await()
 
         return if (documentSnapshot.exists()) {
@@ -53,7 +53,7 @@ class BooksRemoteDataSource {
         }
     }
 
-    suspend fun deleteBookFromFirebase(bookId: Int) {
+    suspend fun deleteBookFromFirebase(bookId: String) {
         booksCollection.document(bookId.toString()).delete().await()
     }
 

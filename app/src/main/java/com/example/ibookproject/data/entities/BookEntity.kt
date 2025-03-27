@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "books")
 data class BookEntity(
-    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @PrimaryKey var id: String = "",
     var title: String = "",
     var author: String = "",
     var genre: String = "",
@@ -13,9 +13,8 @@ data class BookEntity(
     val rating: Float = 0.0f,
     var coverImage: String = "",
     val uploadingUserId: String = "",
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    var lastUpdated: Long = System.currentTimeMillis()
 ) {
-    // Required no-arg constructor for Firebase
-    constructor() : this(0, "", "", "", "", 0.0f, "", "", 0)
+    constructor() : this("", "", "", "", "", 0.0f, "", "", 0L)
 }
-

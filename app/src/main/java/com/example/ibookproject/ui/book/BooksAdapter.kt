@@ -10,7 +10,7 @@ import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
 import com.squareup.picasso.Picasso
 
-class BooksAdapter(private var books: List<BookEntity>, private val onBookClick: (Int) -> Unit) :
+class BooksAdapter(private var books: List<BookEntity>, private val onBookClick: (String) -> Unit) :
     RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
@@ -24,7 +24,7 @@ class BooksAdapter(private var books: List<BookEntity>, private val onBookClick:
 
     override fun getItemCount(): Int = books.size
 
-    class BookViewHolder(itemView: View, private val onBookClick: (Int) -> Unit) : RecyclerView.ViewHolder(itemView) {  // 🔹 מקבל את ה-Callback
+    class BookViewHolder(itemView: View, private val onBookClick: (String) -> Unit) : RecyclerView.ViewHolder(itemView) {  // 🔹 מקבל את ה-Callback
         private val ivBookCover: ImageView = itemView.findViewById(R.id.ivBookCover)
         private val tvBookTitle: TextView = itemView.findViewById(R.id.tvBookTitle)
         private val tvBookAuthor: TextView = itemView.findViewById(R.id.tvBookAuthor)
@@ -47,7 +47,7 @@ class BooksAdapter(private var books: List<BookEntity>, private val onBookClick:
             else{
                 Picasso.get()
                     .load(R.drawable.missing_book_cover)
-                    .placeholder(R.drawable.ic_profile)
+                    .placeholder(R.drawable.missing_book_cover)
                     .error(R.drawable.ic_profile)
                     .fit()
                     .centerCrop()

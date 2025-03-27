@@ -34,7 +34,7 @@ class RatingsRemoteDataSource {
         }
     }
 
-    suspend fun getUserRatingForBook(userId: String, bookId: Int): RatingEntity? {
+    suspend fun getUserRatingForBook(userId: String, bookId: String): RatingEntity? {
         val querySnapshot = ratingsCollection
             .whereEqualTo("bookId", bookId)
             .whereEqualTo("userId", userId)
@@ -44,7 +44,7 @@ class RatingsRemoteDataSource {
         return querySnapshot.documents.firstOrNull()?.let { doc ->
             RatingEntity(
                 id = doc.id.hashCode(),
-                bookId = doc.getLong("bookId")?.toInt() ?: 0,
+                bookId = doc.getString("bookId") ?: "",
                 userId = doc.getString("userId") ?: "",
                 rating = doc.getDouble("rating")?.toFloat() ?: 0f,
                 timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis(),
@@ -57,7 +57,7 @@ class RatingsRemoteDataSource {
         return querySnapshot.documents.map { doc ->
             RatingEntity(
                 id = doc.id.hashCode(),
-                bookId = doc.getLong("bookId")?.toInt() ?: 0,
+                bookId = doc.getString("bookId") ?: "",
                 userId = doc.getString("userId") ?: "",
                 rating = doc.getDouble("rating")?.toFloat() ?: 0f,
                 timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis()

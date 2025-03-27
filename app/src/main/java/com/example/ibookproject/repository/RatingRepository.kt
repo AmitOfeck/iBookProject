@@ -27,7 +27,7 @@ class RatingRepository(
         }
     }
 
-    suspend fun getUserRatingForBook(userId: String, bookId: Int): RatingEntity? {
+    suspend fun getUserRatingForBook(userId: String, bookId: String): RatingEntity? {
         return withContext(Dispatchers.IO) {
             var cachedRating = ratingDao.getUserRatingForBook(userId, bookId)
             val isExpired = cachedRating == null ||
@@ -42,7 +42,7 @@ class RatingRepository(
         }
     }
 
-    suspend fun getAverageRating(bookId: Int): Float {
+    suspend fun getAverageRating(bookId: String): Float {
         return withContext(Dispatchers.IO) {
             val lastUpdated = ratingDao.getLastUpdatedForBook(bookId) ?: 0L
             val isExpired = (System.currentTimeMillis() - lastUpdated) > TTL_MILLIS

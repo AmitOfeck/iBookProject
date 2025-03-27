@@ -18,7 +18,7 @@ class CommentViewModel(application: Application) : AndroidViewModel(application)
     private val _comments = MutableStateFlow<List<CommentEntity>>(emptyList())
     val comments: StateFlow<List<CommentEntity>> = _comments
 
-    fun getCommentsForBook(bookId: Int) {
+    fun getCommentsForBook(bookId: String) {
         viewModelScope.launch {
             commentRepository.getCommentsForBook(bookId).collect { commentList ->
                 _comments.value = commentList

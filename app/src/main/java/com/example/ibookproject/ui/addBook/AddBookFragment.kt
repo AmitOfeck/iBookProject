@@ -23,6 +23,7 @@ import com.example.ibookproject.ui.Genres
 import com.example.ibookproject.ui.comment.CommentViewModel
 import com.example.ibookproject.ui.rating.RatingViewModel
 import com.squareup.picasso.Picasso
+import java.util.UUID
 
 class AddBookFragment : Fragment() {
     private var _binding: FragmentAddBookBinding? = null
@@ -50,6 +51,8 @@ class AddBookFragment : Fragment() {
         binding.genreSpinner.adapter = adapter
 
         binding.submitButton.setOnClickListener {
+            val bookId = generateShortUUID()
+
             val selectedGenre = binding.genreSpinner.selectedItem.toString()
             val title = binding.bookTitleInput.text.toString().trim()
             val author = binding.authorInput.text.toString().trim()
@@ -63,6 +66,7 @@ class AddBookFragment : Fragment() {
             }
 
             val newBook = BookEntity(
+                id = bookId,
                 uploadingUserId = userId,
                 title = title,
                 author = author,
@@ -72,17 +76,20 @@ class AddBookFragment : Fragment() {
             )
 
             if (imageUri != null) {
-                val path = "images/profile/$userId.jpg"
+                val path = "images/books/$title-${generateShortUUID()}.jpg"
                 addBookViewModel.uploadImage(imageUri!!, path) { imageUrl ->
-                    if (imageUrl != null) {
+                    if (!imageUrl.isNullOrEmpty()) {
                         newBook.coverImage = imageUrl
                     } else {
                         Toast.makeText(requireContext(), "שגיאה בהעלאת תמונה", Toast.LENGTH_SHORT).show()
                     }
+
+                    addBookViewModel.addBook(newBook)
                 }
+            } else {
+                addBookViewModel.addBook(newBook)
             }
 
-            addBookViewModel.addBook(newBook)
             Toast.makeText(requireContext(), "הספר נוסף בהצלחה!", Toast.LENGTH_SHORT).show()
 
             // ניקוי השדות אחרי הוספה
@@ -104,7 +111,7 @@ class AddBookFragment : Fragment() {
                     }
 
                     val bundle = Bundle().apply {
-                        putInt("bookId", bookId)
+                        putString("bookId", bookId)
                     }
                     findNavController().navigate(R.id.action_addBookFragment_to_bookDetailsFragment, bundle)
                 }
@@ -125,10 +132,14 @@ class AddBookFragment : Fragment() {
                 imageUri = result.data?.data
                 Picasso.get()
                     .load(imageUri)
-                    .placeholder(R.drawable.ic_profile)
+                    .placeholder(R.drawable.missing_book_cover)
                     .into(binding.coverImage)
             }
         }
+
+    fun generateShortUUID(): String {
+        return UUID.randomUUID().toString().substring(0, 8) // לוקח רק 8 תווים
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

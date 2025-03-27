@@ -13,16 +13,16 @@ interface CommentDao {
     suspend fun insertComment(comment: CommentEntity)
 
     @Query("SELECT * FROM comments WHERE bookId = :bookId  ORDER BY timestamp DESC")
-    fun getCommentsForBook(bookId: Int): Flow<List<CommentEntity>>
+    fun getCommentsForBook(bookId: String): Flow<List<CommentEntity>>
 
     @Query("DELETE FROM comments WHERE bookId = :bookId")
-    suspend fun deleteCommentsForBook(bookId: Int)
+    suspend fun deleteCommentsForBook(bookId: String)
 
     @Query("SELECT * FROM comments WHERE userId = :userId  ORDER BY timestamp DESC")
     fun getCommentsByUserId(userId: String): Flow<List<CommentEntity>>
 
     @Query("SELECT * FROM comments WHERE bookId = :bookId ORDER BY lastUpdated DESC LIMIT 1")
-    suspend fun getLatestCommentForBook(bookId: Int): CommentEntity?
+    suspend fun getLatestCommentForBook(bookId: String): CommentEntity?
 
     @Query("SELECT * FROM comments WHERE userId = :userId ORDER BY lastUpdated DESC LIMIT 1")
     suspend fun getLatestCommentByUserId(userId: String): CommentEntity?

@@ -14,11 +14,11 @@ import kotlinx.coroutines.launch
 class BookDetailsViewModel(application: Application) : AndroidViewModel(application)  {
     private val bookRepository: BookRepository = BookRepository(BookDatabase.getDatabase(application).bookDao())
 
-    fun getBookById(bookId: Int): LiveData<BookEntity> {
+    fun getBookById(bookId: String): LiveData<BookEntity> {
         return bookRepository.getBookById(bookId).asLiveData()
     }
 
-    fun deleteBookById(bookId: Int) {
+    fun deleteBookById(bookId: String) {
         viewModelScope.launch {
             bookRepository.deleteBook(bookId)
         }

@@ -64,7 +64,7 @@ class UserProfileFragment : Fragment() {
         rvUserBooks.layoutManager = LinearLayoutManager(requireContext())
         booksAdapter = BooksAdapter(uploadedBooks) { bookId ->
             val bundle = Bundle().apply {
-                putInt("bookId", bookId)
+                putString("bookId", bookId)
             }
             findNavController().navigate(R.id.action_userProfileFragment_to_bookDetailsFragment, bundle)
         }
@@ -128,8 +128,8 @@ class UserProfileFragment : Fragment() {
         }
         else{
             Picasso.get()
-                .load(R.drawable.missing_book_cover)
-                .placeholder(R.drawable.missing_book_cover)
+                .load(R.drawable.ic_profile)
+                .placeholder(R.drawable.ic_profile)
                 .error(R.drawable.ic_profile)
                 .fit()
                 .centerCrop()

@@ -19,13 +19,13 @@ class AddBookViewModel(application: Application) : AndroidViewModel(application)
     private val bookRepository: BookRepository = BookRepository(BookDatabase.getDatabase(application).bookDao())
     private val uploadImageRepository: ImageUploadRepository = ImageUploadRepository()
 
-    private val _bookId = MutableLiveData<Int>()
-    val bookId: LiveData<Int> get() = _bookId
+    private val _bookId = MutableLiveData<String>()
+    val bookId: LiveData<String> get() = _bookId
 
     fun addBook(book: BookEntity) {
         viewModelScope.launch {
-            val bookId = bookRepository.insertBook(book)
-            _bookId.postValue(bookId)
+            bookRepository.insertBook(book)
+            _bookId.postValue(book.id)
         }
     }
 

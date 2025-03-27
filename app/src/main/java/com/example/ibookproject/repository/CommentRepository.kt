@@ -12,7 +12,7 @@ class CommentRepository(private val commentDao: CommentDao) {
 
     private val cacheValidityTime = 60 * 1000
 
-     fun getCommentsForBook(bookId: Int): Flow<List<CommentEntity>> = flow {
+     fun getCommentsForBook(bookId: String): Flow<List<CommentEntity>> = flow {
         val cachedComment = commentDao.getLatestCommentForBook(bookId)
         val currentTime = System.currentTimeMillis()
 

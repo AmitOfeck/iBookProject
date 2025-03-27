@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 class BookRepository(private val bookDao: BookDao) {
     private val booksRemoteDataSource: BooksRemoteDataSource = BooksRemoteDataSource()
 
-    fun getBookById(bookId: Int): Flow<BookEntity> = flow {
+    fun getBookById(bookId: String): Flow<BookEntity> = flow {
         val cachedBook = bookDao.getBookById(bookId).first()
         if (cachedBook != null) {
             emit(cachedBook)
@@ -37,13 +37,12 @@ class BookRepository(private val bookDao: BookDao) {
         }
     }
 
-    suspend fun insertBook(book: BookEntity): Int {
-        val bookId = bookDao.insertBook(book).toInt()
+    suspend fun insertBook(book: BookEntity) {
+        bookDao.insertBook(book).toInt()
         booksRemoteDataSource.saveBookToFirebase(book)
-        return bookId
     }
 
-    suspend fun deleteBook(bookId: Int) {
+    suspend fun deleteBook(bookId: String) {
         bookDao.deleteBook(bookId)
         booksRemoteDataSource.deleteBookFromFirebase(bookId)
     }
@@ -55,7 +54,7 @@ class BookRepository(private val bookDao: BookDao) {
 
 
     // Get books by IDs, first trying Room, then Firebase
-    fun getBooksByIds(bookIds: List<Int>): Flow<List<BookEntity>> = flow {
+    fun getBooksByIds(bookIds: List<String>): Flow<List<BookEntity>> = flow {
         val localBooks = bookDao.getBooksByIds(bookIds).firstOrNull()
         if (!localBooks.isNullOrEmpty()) {
             emit(localBooks)

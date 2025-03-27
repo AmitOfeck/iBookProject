@@ -18,14 +18,14 @@ interface RatingDao {
     suspend fun updateRating(rating: RatingEntity)
 
     @Query("SELECT * FROM ratings WHERE bookId = :bookId AND userId = :userId LIMIT 1")
-    fun getUserRatingForBook(userId: String, bookId: Int): RatingEntity?
+    fun getUserRatingForBook(userId: String, bookId: String): RatingEntity?
 
     @Query("SELECT AVG(rating) FROM ratings WHERE bookId = :bookId")
-    suspend fun getAverageRating(bookId: Int): Float?
+    suspend fun getAverageRating(bookId: String): Float?
 
     @Query("DELETE FROM ratings")
     suspend fun clearRatings()
 
     @Query("SELECT MAX(lastUpdated) FROM ratings WHERE bookId = :bookId")
-    suspend fun getLastUpdatedForBook(bookId: Int): Long?
+    suspend fun getLastUpdatedForBook(bookId: String): Long?
 }

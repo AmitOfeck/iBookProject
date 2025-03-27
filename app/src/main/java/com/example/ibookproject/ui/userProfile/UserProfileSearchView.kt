@@ -34,7 +34,7 @@ class UserProfileSearchView(application: Application) : AndroidViewModel(applica
 //    }
 
 
-    fun getBooksById(bookIds: List<Int>): LiveData<List<BookEntity>> {
+    fun getBooksById(bookIds: List<String>): LiveData<List<BookEntity>> {
         return bookRepository.getBooksByIds(bookIds).asLiveData()
     }
 }

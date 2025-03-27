@@ -20,7 +20,7 @@ class CommentsRemoteDataSource {
         commentsCollection.add(commentMap).await()
     }
 
-    suspend fun getCommentsForBook(bookId: Int): List<CommentEntity> {
+    suspend fun getCommentsForBook(bookId: String): List<CommentEntity> {
         val querySnapshot = commentsCollection
             .whereEqualTo("bookId", bookId)
             .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -30,7 +30,7 @@ class CommentsRemoteDataSource {
         return querySnapshot.documents.map { doc ->
             CommentEntity(
                 id = doc.id.hashCode(),
-                bookId = doc.getLong("bookId")?.toInt() ?: 0,
+                bookId = doc.getString("bookId")?: "",
                 userId = doc.getString("userId") ?: "",
                 comment = doc.getString("comment") ?: "",
                 timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis(),
@@ -48,7 +48,7 @@ class CommentsRemoteDataSource {
         return querySnapshot.documents.map { doc ->
             CommentEntity(
                 id = doc.id.hashCode(),
-                bookId = doc.getLong("bookId")?.toInt() ?: 0,
+                bookId = doc.getString("bookId") ?: "",
                 userId = doc.getString("userId") ?: "",
                 comment = doc.getString("comment") ?: "",
                 timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis(),

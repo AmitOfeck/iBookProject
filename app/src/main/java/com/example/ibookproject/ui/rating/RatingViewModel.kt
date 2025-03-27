@@ -23,7 +23,7 @@ class RatingViewModel(application: Application) : AndroidViewModel(application) 
     val userRating: StateFlow<RatingEntity?> = _userRating
 
 
-    fun getAverageRating(bookId: Int) {
+    fun getAverageRating(bookId: String) {
         viewModelScope.launch {
             _avgRating.value = ratingRepository.getAverageRating(bookId)
         }
@@ -44,7 +44,7 @@ class RatingViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-     fun getUserRatingForBook(userId:String, bookId: Int) {
+     fun getUserRatingForBook(userId:String, bookId: String) {
         viewModelScope.launch {
             _userRating.value = ratingRepository.getUserRatingForBook(userId, bookId)
         }
