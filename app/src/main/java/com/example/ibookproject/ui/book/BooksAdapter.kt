@@ -35,7 +35,7 @@ class BooksAdapter(private var books: List<BookEntity>, private val onBookClick:
             tvBookAuthor.text = "by ${book.author}"
             tvBookGenre.text = "Genre: ${book.genre}"
 
-            if(book.coverImage != "") {
+            if(!book.coverImage.isNullOrEmpty()) {
                 Picasso.get()
                     .load(book.coverImage)
                     .placeholder(R.drawable.missing_book_cover)

@@ -85,7 +85,7 @@ class BookDetailsFragment : Fragment() {
             tvBookAuthor.setText(book.author)
             tvBookDescription.setText(book.description)
 
-            if(book.coverImage != "") {
+            if(!book.coverImage.isNullOrEmpty()) {
                 Picasso.get()
                     .load(book.coverImage)
                     .placeholder(R.drawable.missing_book_cover)

@@ -86,14 +86,7 @@ class UserProfileFragment : Fragment() {
             if (user != null) {
                 tvUsername.text = user.name
                 tvUserBio.text = user.bio
-
-                Picasso.get()
-                    .load(user.profileImage)
-                    .placeholder(R.drawable.ic_profile)
-                    .error(R.drawable.ic_profile)
-                    .fit()
-                    .centerCrop()
-                    .into(ivProfilePicture)
+                loadProfileImg(user.profileImage)
             } else {
                 userViewModel.fetchUserFromRemoteAndCache(userId)
 
@@ -101,14 +94,7 @@ class UserProfileFragment : Fragment() {
                     if (firebaseUser != null) {
                         tvUsername.text = firebaseUser.name
                         tvUserBio.text = firebaseUser.bio
-
-                        Picasso.get()
-                            .load(firebaseUser.profileImage)
-                            .placeholder(R.drawable.ic_profile)
-                            .error(R.drawable.ic_profile)
-                            .fit()
-                            .centerCrop()
-                            .into(ivProfilePicture)
+                        loadProfileImg(firebaseUser.profileImage)
                     }
                 }
             }
@@ -128,6 +114,27 @@ class UserProfileFragment : Fragment() {
     private fun getUserId(context: Context): String? {
         val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
         return sharedPref.getString("user_id", null)
+    }
+
+    private fun loadProfileImg(imgUrl: String?) {
+        if(!imgUrl.isNullOrEmpty()) {
+            Picasso.get()
+                .load(imgUrl)
+                .placeholder(R.drawable.ic_profile)
+                .error(R.drawable.ic_profile)
+                .fit()
+                .centerCrop()
+                .into(ivProfilePicture)
+        }
+        else{
+            Picasso.get()
+                .load(R.drawable.missing_book_cover)
+                .placeholder(R.drawable.missing_book_cover)
+                .error(R.drawable.ic_profile)
+                .fit()
+                .centerCrop()
+                .into(ivProfilePicture)
+        }
     }
 
     @SuppressLint("SetTextI18n")

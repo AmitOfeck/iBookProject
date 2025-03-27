@@ -69,7 +69,7 @@ class EditBookFragment : Fragment() {
             etDescription.setText(book.description)
             imageUri = Uri.parse(book.coverImage)
 
-            if(book.coverImage != "") {
+            if(!book.coverImage.isNullOrEmpty()) {
                 Picasso.get()
                     .load(book.coverImage)
                     .placeholder(R.drawable.missing_book_cover)
