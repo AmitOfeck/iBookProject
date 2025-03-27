@@ -11,7 +11,7 @@ class RatingRepository(
     private val ratingDao: RatingDao,
 ) {
     private val ratingsRemoteDataSource: RatingsRemoteDataSource = RatingsRemoteDataSource()
-    private val TTL_MILLIS = 60 * 1000
+    private val ratingsTtl = 60 * 1000
 
     suspend fun addRating(rating: RatingEntity) {
         withContext(Dispatchers.IO) {
@@ -31,7 +31,7 @@ class RatingRepository(
         return withContext(Dispatchers.IO) {
             var cachedRating = ratingDao.getUserRatingForBook(userId, bookId)
             val isExpired = cachedRating == null ||
-                    (System.currentTimeMillis() - cachedRating.lastUpdated) > TTL_MILLIS
+                    (System.currentTimeMillis() - cachedRating.lastUpdated) > ratingsTtl
 
             if (isExpired) {
                 refreshRatings()
@@ -45,7 +45,7 @@ class RatingRepository(
     suspend fun getAverageRating(bookId: String): Float {
         return withContext(Dispatchers.IO) {
             val lastUpdated = ratingDao.getLastUpdatedForBook(bookId) ?: 0L
-            val isExpired = (System.currentTimeMillis() - lastUpdated) > TTL_MILLIS
+            val isExpired = (System.currentTimeMillis() - lastUpdated) > ratingsTtl
 
             if (isExpired) {
                 refreshRatings()

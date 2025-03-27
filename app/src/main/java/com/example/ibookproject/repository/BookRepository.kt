@@ -12,26 +12,33 @@ import kotlinx.coroutines.flow.flowOn
 
 class BookRepository(private val bookDao: BookDao) {
     private val booksRemoteDataSource: BooksRemoteDataSource = BooksRemoteDataSource()
+    private val ratingsTtl = 60 * 1000
 
     fun getBookById(bookId: String): Flow<BookEntity> = flow {
         val cachedBook = bookDao.getBookById(bookId).first()
-        if (cachedBook != null) {
+        val isExpired = (System.currentTimeMillis() - cachedBook.lastUpdated) > ratingsTtl
+
+        if (!isExpired) {
             emit(cachedBook)
         } else {
             val bookFromFirebase = booksRemoteDataSource.getBookFromFirebase(bookId)
             if (bookFromFirebase != null) {
-                bookDao.insertBook(bookFromFirebase)
+                bookDao.updateBook(bookFromFirebase)
                 emit(bookFromFirebase)
             }
         }
     }
 
     fun getAllBooks(): Flow<List<BookEntity>> = flow {
-        val cachedBooks = bookDao.getAllBooks().first()
-        if (cachedBooks.isNotEmpty()) {
+        val cachedBook = bookDao.getLatestBook()
+        val isExpired = (System.currentTimeMillis() - (cachedBook?.lastUpdated ?: 0)) > ratingsTtl
+
+        if (cachedBook != null && !isExpired) {
+            val cachedBooks = bookDao.getAllBooks().first()
             emit(cachedBooks)
         } else {
             val booksFromFirebase = booksRemoteDataSource.getAllBooksFromFirebase()
+            bookDao.clearBooks()
             bookDao.insertBooks(booksFromFirebase)
             emit(booksFromFirebase)
         }
@@ -55,9 +62,12 @@ class BookRepository(private val bookDao: BookDao) {
 
     // Get books by IDs, first trying Room, then Firebase
     fun getBooksByIds(bookIds: List<String>): Flow<List<BookEntity>> = flow {
-        val localBooks = bookDao.getBooksByIds(bookIds).firstOrNull()
-        if (!localBooks.isNullOrEmpty()) {
-            emit(localBooks)
+        val cachedBook = bookDao.getLatestBookById(bookIds)
+        val isExpired = (System.currentTimeMillis() - (cachedBook?.lastUpdated ?: 0)) > ratingsTtl
+
+        if (!isExpired) {
+            val localBooks = bookDao.getBooksByIds(bookIds).firstOrNull()
+            emit(localBooks!!)
         } else {
             val firebaseBooks = booksRemoteDataSource.getBooksByIds(bookIds)
             bookDao.insertBooks(firebaseBooks)
@@ -67,9 +77,12 @@ class BookRepository(private val bookDao: BookDao) {
 
     // Get books by uploading user ID, first trying Room, then Firebase
     fun getBooksByUploadingUser(userId: String): Flow<List<BookEntity>> = flow {
-        val localBooks = bookDao.getBooksByUserId(userId).firstOrNull()
-        if (!localBooks.isNullOrEmpty()) {
-            emit(localBooks)
+        val cachedBook = bookDao.getLatestBookByUser(userId)
+        val isExpired = (System.currentTimeMillis() - (cachedBook?.lastUpdated ?: 0)) > ratingsTtl
+
+        if (cachedBook != null && !isExpired) {
+            val localBooks = bookDao.getBooksByUserId(userId).firstOrNull()
+            emit(localBooks!!)
         } else {
             val firebaseBooks = booksRemoteDataSource.getBooksByUploadingUser(userId)
             bookDao.insertBooks(firebaseBooks)
