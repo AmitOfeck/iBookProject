@@ -1,5 +1,7 @@
 package com.example.ibookproject.ui.addBook
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,6 +22,7 @@ import com.example.ibookproject.databinding.FragmentAddBookBinding
 import com.example.ibookproject.ui.Genres
 import com.example.ibookproject.ui.comment.CommentViewModel
 import com.example.ibookproject.ui.rating.RatingViewModel
+import com.squareup.picasso.Picasso
 
 class AddBookFragment : Fragment() {
     private var _binding: FragmentAddBookBinding? = null
@@ -41,16 +44,7 @@ class AddBookFragment : Fragment() {
         }
         _binding = FragmentAddBookBinding.inflate(inflater, container, false)
 
-        val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
-                imageUri = uri
-                binding.coverImage.setImageURI(uri)
-            }
-        }
-
-        binding.uploadImageButton.setOnClickListener {
-            pickImageLauncher.launch("image/*")
-        }
+        binding.uploadImageButton.setOnClickListener { openGallery() }
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, Genres.getAll())
         binding.genreSpinner.adapter = adapter
@@ -68,11 +62,6 @@ class AddBookFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            if (imageUri == null) {
-                Toast.makeText(requireContext(), "נא להעלות תמונה", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
             val newBook = BookEntity(
                 uploadingUserId = userId,
                 title = title,
@@ -80,11 +69,20 @@ class AddBookFragment : Fragment() {
                 description = description,
                 genre = selectedGenre,
                 rating = rating,
-                coverImage = imageUri.toString()
             )
 
-            addBookViewModel.addBook(newBook)
+            if (imageUri != null) {
+                val path = "images/profile/$userId.jpg"
+                addBookViewModel.uploadImage(imageUri!!, path) { imageUrl ->
+                    if (imageUrl != null) {
+                        newBook.coverImage = imageUrl
+                    } else {
+                        Toast.makeText(requireContext(), "שגיאה בהעלאת תמונה", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
 
+            addBookViewModel.addBook(newBook)
             Toast.makeText(requireContext(), "הספר נוסף בהצלחה!", Toast.LENGTH_SHORT).show()
 
             // ניקוי השדות אחרי הוספה
@@ -115,6 +113,22 @@ class AddBookFragment : Fragment() {
 
         return binding.root
     }
+
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK).apply { type = "image/*" }
+        galleryLauncher.launch(intent)
+    }
+
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                imageUri = result.data?.data
+                Picasso.get()
+                    .load(imageUri)
+                    .placeholder(R.drawable.ic_profile)
+                    .into(binding.coverImage)
+            }
+        }
 
     override fun onDestroyView() {
         super.onDestroyView()

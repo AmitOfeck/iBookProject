@@ -7,12 +7,13 @@ import com.example.ibookproject.data.database.UserDatabase
 import com.example.ibookproject.data.entities.UserEntity
 import com.example.ibookproject.data.remote.UserRemoteDataSource
 import com.example.ibookproject.data.repository.UserRepository
+import com.example.ibookproject.repository.ImageUploadRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
-
     private val userRepository: UserRepository
+    private val uploadImageRepository: ImageUploadRepository
 
     private val _userLiveData = MutableLiveData<UserEntity?>()
     val userLiveData: LiveData<UserEntity?> = _userLiveData
@@ -21,6 +22,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         val userDao = UserDatabase.getDatabase(application).userDao()
         val remoteDataSource = UserRemoteDataSource()
         userRepository = UserRepository(userDao, remoteDataSource)
+        uploadImageRepository = ImageUploadRepository()
     }
 
     fun insertUser(user: UserEntity) {
@@ -59,6 +61,6 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun uploadImage(imageUri: Uri, storagePath: String, onResult: (String?) -> Unit) {
-        userRepository.uploadImage(imageUri, storagePath, onResult)
+        uploadImageRepository.uploadImage(imageUri, storagePath, onResult)
     }
 }

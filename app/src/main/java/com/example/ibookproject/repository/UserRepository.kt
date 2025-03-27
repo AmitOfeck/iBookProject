@@ -11,9 +11,6 @@ class UserRepository(
     private val userDao: UserDao,
     private val remoteDataSource: UserRemoteDataSource
 ) {
-
-    private val imageUploadService = ImageUploadService()
-
     //  לוקאלי (Room)
     suspend fun insertUser(user: UserEntity) = userDao.insertUser(user)
 
@@ -30,10 +27,5 @@ class UserRepository(
 
     fun fetchUserFromRemote(userId: String, onResult: (UserEntity?) -> Unit) {
         remoteDataSource.getUserProfileFromFirestore(userId, onResult)
-    }
-
-    //  Firebase Storage – העלאת תמונה
-    fun uploadImage(imageUri: Uri, storagePath: String, onResult: (String?) -> Unit) {
-        imageUploadService.uploadImage(imageUri, storagePath, onResult)
     }
 }
