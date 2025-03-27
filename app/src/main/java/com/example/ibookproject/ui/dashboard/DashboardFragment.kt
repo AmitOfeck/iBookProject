@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ibookproject.R
 import com.example.ibookproject.databinding.FragmentDashboardBinding
+import com.example.ibookproject.Utils
 
 class DashboardFragment : Fragment() {
 
@@ -27,14 +28,19 @@ class DashboardFragment : Fragment() {
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        Utils.manageLoadingSpinner(binding.progressBar, true)
+
         quoteViewModel.quotes.observe(viewLifecycleOwner, Observer { quotes ->
             quoteAdapter = QuoteAdapter(quotes)
             binding.recyclerView.adapter = quoteAdapter
+
+            Utils.manageLoadingSpinner(binding.progressBar, false)
         })
 
         quoteViewModel.loadQuotes()
 
         binding.refreshButton.setOnClickListener {
+            Utils.manageLoadingSpinner(binding.progressBar, true)
             quoteViewModel.loadQuotes()
         }
 
