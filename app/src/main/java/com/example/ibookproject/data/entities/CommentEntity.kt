@@ -6,8 +6,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "comments")
 data class CommentEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val bookId: Int,
+    val bookId: String,
     val userId: String,
     val comment: String,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    var lastUpdated: Long = System.currentTimeMillis()
 )

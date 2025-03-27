@@ -64,7 +64,7 @@ class UserProfileFragment : Fragment() {
         rvUserBooks.layoutManager = LinearLayoutManager(requireContext())
         booksAdapter = BooksAdapter(uploadedBooks) { bookId ->
             val bundle = Bundle().apply {
-                putInt("bookId", bookId)
+                putString("bookId", bookId)
             }
             findNavController().navigate(R.id.action_userProfileFragment_to_bookDetailsFragment, bundle)
         }
@@ -86,16 +86,7 @@ class UserProfileFragment : Fragment() {
             if (user != null) {
                 tvUsername.text = user.name
                 tvUserBio.text = user.bio
-
-                Log.d("UserProfileFragment", "Profile Image URI: ${user.profileImage}")
-
-                Picasso.get()
-                    .load(user.profileImage)
-                    .placeholder(R.drawable.ic_profile)
-                    .error(R.drawable.ic_profile)
-                    .fit()
-                    .centerCrop()
-                    .into(ivProfilePicture)
+                loadProfileImg(user.profileImage)
             } else {
                 userViewModel.fetchUserFromRemoteAndCache(userId)
 
@@ -103,14 +94,7 @@ class UserProfileFragment : Fragment() {
                     if (firebaseUser != null) {
                         tvUsername.text = firebaseUser.name
                         tvUserBio.text = firebaseUser.bio
-
-                        Picasso.get()
-                            .load(firebaseUser.profileImage)
-                            .placeholder(R.drawable.ic_profile)
-                            .error(R.drawable.ic_profile)
-                            .fit()
-                            .centerCrop()
-                            .into(ivProfilePicture)
+                        loadProfileImg(firebaseUser.profileImage)
                     }
                 }
             }
@@ -132,6 +116,27 @@ class UserProfileFragment : Fragment() {
         return sharedPref.getString("user_id", null)
     }
 
+    private fun loadProfileImg(imgUrl: String?) {
+        if(!imgUrl.isNullOrEmpty()) {
+            Picasso.get()
+                .load(imgUrl)
+                .placeholder(R.drawable.ic_profile)
+                .error(R.drawable.ic_profile)
+                .fit()
+                .centerCrop()
+                .into(ivProfilePicture)
+        }
+        else{
+            Picasso.get()
+                .load(R.drawable.ic_profile)
+                .placeholder(R.drawable.ic_profile)
+                .error(R.drawable.ic_profile)
+                .fit()
+                .centerCrop()
+                .into(ivProfilePicture)
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun loadUserData(userId: String) {
         userProfileSearchView.getBooksByUser(userId).observe(viewLifecycleOwner) { books ->
@@ -140,7 +145,9 @@ class UserProfileFragment : Fragment() {
             booksAdapter.updateBooks(uploadedBooks)
         }
 
-        userProfileSearchView.getCommentsByUser(userId).observe(viewLifecycleOwner) { comments ->
+        userProfileSearchView.getCommentsByUser(userId)
+
+        userProfileSearchView.comments.observe(viewLifecycleOwner) { comments ->
             val bookIds = comments.map { it.bookId }
             userProfileSearchView.getBooksById(bookIds).observe(viewLifecycleOwner) { books ->
                 commentedBooks = books.toMutableList()

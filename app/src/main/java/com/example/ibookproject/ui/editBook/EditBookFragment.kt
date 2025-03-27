@@ -1,5 +1,7 @@
 package com.example.ibookproject.ui.editBook
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,17 +12,19 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.Genres
 import com.example.ibookproject.ui.bookDetails.BookDetailsViewModel
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class EditBookFragment : Fragment() {
     private lateinit var etTitle: EditText
@@ -32,7 +36,7 @@ class EditBookFragment : Fragment() {
     private lateinit var genreSpinner: Spinner
     private lateinit var bookDetails: BookEntity
     private var imageUri: Uri? = null
-    private var bookId: Int = -1
+    private var bookId: String = ""
 
     private val editBookViewModel: EditBookViewModel by activityViewModels()
     private val bookDetailsViewModel: BookDetailsViewModel by activityViewModels()
@@ -55,9 +59,9 @@ class EditBookFragment : Fragment() {
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, Genres.getAll())
         genreSpinner.adapter = adapter
 
-        bookId = arguments?.getInt("bookId") ?: -1
+        bookId = arguments?.getString("bookId") ?: ""
 
-        if (bookId == -1) {
+        if (bookId == "") {
             findNavController().popBackStack()
             return view
         }
@@ -69,9 +73,24 @@ class EditBookFragment : Fragment() {
             etDescription.setText(book.description)
             imageUri = Uri.parse(book.coverImage)
 
-            Glide.with(requireContext())
-                .load(book.coverImage)
-                .into(coverImage)
+            if(!book.coverImage.isNullOrEmpty()) {
+                Picasso.get()
+                    .load(book.coverImage)
+                    .placeholder(R.drawable.missing_book_cover)
+                    .error(R.drawable.missing_book_cover)
+                    .fit()
+                    .centerCrop()
+                    .into(coverImage)
+            }
+            else{
+                Picasso.get()
+                    .load(R.drawable.missing_book_cover)
+                    .placeholder(R.drawable.missing_book_cover)
+                    .error(R.drawable.ic_profile)
+                    .fit()
+                    .centerCrop()
+                    .into(coverImage)
+            }
 
             // קביעת הז'אנר הנבחר
             val position = Genres.getAll().indexOf(book.genre)
@@ -80,16 +99,7 @@ class EditBookFragment : Fragment() {
             }
         }
 
-        val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
-                imageUri = uri
-                coverImage.setImageURI(uri)
-            }
-        }
-
-        btnUploadImage.setOnClickListener {
-            pickImageLauncher.launch("image/*")
-        }
+        btnUploadImage.setOnClickListener { openGallery() }
 
         btnSave.setOnClickListener {
             val selectedGenre = genreSpinner.selectedItem.toString()
@@ -97,14 +107,52 @@ class EditBookFragment : Fragment() {
             bookDetails.author = etAuthor.text.toString().trim()
             bookDetails.genre = selectedGenre
             bookDetails.description = etDescription.text.toString().trim()
-            bookDetails.coverImage = imageUri.toString()
 
-            lifecycleScope.launch {
-                editBookViewModel.updateBook(bookDetails)
-                findNavController().popBackStack()
+            if (imageUri != null) {
+                val path = "images/books/${bookDetails.title}-${generateShortUUID()}.jpg"
+                editBookViewModel.uploadImage(imageUri!!, path) { imageUrl ->
+                    if (!imageUrl.isNullOrEmpty()) {
+                        bookDetails.coverImage = imageUrl
+                    } else {
+                        Toast.makeText(requireContext(), "שגיאה בהעלאת תמונה", Toast.LENGTH_SHORT).show()
+                    }
+
+                    lifecycleScope.launch {
+                        editBookViewModel.updateBook(bookDetails)
+                        findNavController().popBackStack()
+                    }
+                }
+            } else {
+                lifecycleScope.launch {
+                    editBookViewModel.updateBook(bookDetails)
+                    findNavController().popBackStack()
+                }
             }
         }
 
         return view
+    }
+
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK).apply { type = "image/*" }
+        galleryLauncher.launch(intent)
+    }
+
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                imageUri = result.data?.data
+                Picasso.get()
+                    .load(imageUri)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .fit()
+                    .centerCrop()
+                    .into(coverImage)
+            }
+        }
+
+    fun generateShortUUID(): String {
+        return UUID.randomUUID().toString().substring(0, 8) // לוקח רק 8 תווים
     }
 }

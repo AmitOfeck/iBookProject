@@ -8,25 +8,28 @@ import androidx.lifecycle.viewModelScope
 import com.example.ibookproject.data.database.BookDatabase
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.repository.CommentRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class CommentViewModel(application: Application) : AndroidViewModel(application) {
-
     private val commentRepository: CommentRepository = CommentRepository(BookDatabase.getDatabase(application).commentDao())
 
-    fun getCommentsForBook(bookId: Int): LiveData<List<CommentEntity>> {
-        return commentRepository.getCommentsForBook(bookId)
+    private val _comments = MutableStateFlow<List<CommentEntity>>(emptyList())
+    val comments: StateFlow<List<CommentEntity>> = _comments
+
+    fun getCommentsForBook(bookId: String) {
+        viewModelScope.launch {
+            commentRepository.getCommentsForBook(bookId).collect { commentList ->
+                _comments.value = commentList
+            }
+        }
     }
 
     fun addComment(comment: CommentEntity) {
         viewModelScope.launch {
             commentRepository.addComment(comment)
-        }
-    }
-
-    fun deleteComment(commentId: Int) {
-        viewModelScope.launch {
-            commentRepository.deleteComment(commentId)
+            getCommentsForBook(comment.bookId)
         }
     }
 }

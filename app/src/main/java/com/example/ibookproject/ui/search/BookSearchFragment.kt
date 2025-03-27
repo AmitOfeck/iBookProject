@@ -44,7 +44,7 @@ class BookSearchFragment : Fragment() {
 
         booksAdapter = BooksAdapter(displayedBooks) { bookId ->
             val bundle = Bundle().apply {
-                putInt("bookId", bookId)
+                putString("bookId", bookId)
             }
             findNavController().navigate(R.id.action_searchBookFragment_to_bookDetailsFragment, bundle)
         }

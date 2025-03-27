@@ -1,5 +1,7 @@
 package com.example.ibookproject.ui.addBook
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,6 +22,8 @@ import com.example.ibookproject.databinding.FragmentAddBookBinding
 import com.example.ibookproject.ui.Genres
 import com.example.ibookproject.ui.comment.CommentViewModel
 import com.example.ibookproject.ui.rating.RatingViewModel
+import com.squareup.picasso.Picasso
+import java.util.UUID
 
 class AddBookFragment : Fragment() {
     private var _binding: FragmentAddBookBinding? = null
@@ -41,21 +45,14 @@ class AddBookFragment : Fragment() {
         }
         _binding = FragmentAddBookBinding.inflate(inflater, container, false)
 
-        val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
-                imageUri = uri
-                binding.coverImage.setImageURI(uri)
-            }
-        }
-
-        binding.uploadImageButton.setOnClickListener {
-            pickImageLauncher.launch("image/*")
-        }
+        binding.uploadImageButton.setOnClickListener { openGallery() }
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, Genres.getAll())
         binding.genreSpinner.adapter = adapter
 
         binding.submitButton.setOnClickListener {
+            val bookId = generateShortUUID()
+
             val selectedGenre = binding.genreSpinner.selectedItem.toString()
             val title = binding.bookTitleInput.text.toString().trim()
             val author = binding.authorInput.text.toString().trim()
@@ -68,22 +65,30 @@ class AddBookFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            if (imageUri == null) {
-                Toast.makeText(requireContext(), "נא להעלות תמונה", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
             val newBook = BookEntity(
+                id = bookId,
                 uploadingUserId = userId,
                 title = title,
                 author = author,
                 description = description,
                 genre = selectedGenre,
                 rating = rating,
-                coverImage = imageUri.toString()
             )
 
-            addBookViewModel.addBook(newBook)
+            if (imageUri != null) {
+                val path = "images/books/$title-${generateShortUUID()}.jpg"
+                addBookViewModel.uploadImage(imageUri!!, path) { imageUrl ->
+                    if (!imageUrl.isNullOrEmpty()) {
+                        newBook.coverImage = imageUrl
+                    } else {
+                        Toast.makeText(requireContext(), "שגיאה בהעלאת תמונה", Toast.LENGTH_SHORT).show()
+                    }
+
+                    addBookViewModel.addBook(newBook)
+                }
+            } else {
+                addBookViewModel.addBook(newBook)
+            }
 
             Toast.makeText(requireContext(), "הספר נוסף בהצלחה!", Toast.LENGTH_SHORT).show()
 
@@ -106,7 +111,7 @@ class AddBookFragment : Fragment() {
                     }
 
                     val bundle = Bundle().apply {
-                        putInt("bookId", bookId)
+                        putString("bookId", bookId)
                     }
                     findNavController().navigate(R.id.action_addBookFragment_to_bookDetailsFragment, bundle)
                 }
@@ -114,6 +119,26 @@ class AddBookFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK).apply { type = "image/*" }
+        galleryLauncher.launch(intent)
+    }
+
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                imageUri = result.data?.data
+                Picasso.get()
+                    .load(imageUri)
+                    .placeholder(R.drawable.missing_book_cover)
+                    .into(binding.coverImage)
+            }
+        }
+
+    fun generateShortUUID(): String {
+        return UUID.randomUUID().toString().substring(0, 8) // לוקח רק 8 תווים
     }
 
     override fun onDestroyView() {

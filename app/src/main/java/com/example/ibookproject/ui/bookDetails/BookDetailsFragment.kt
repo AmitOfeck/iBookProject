@@ -12,15 +12,18 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.Utils
+import com.example.ibookproject.data.dao.RatingDao
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.data.entities.RatingEntity
 import com.example.ibookproject.ui.comment.CommentViewModel
 import com.example.ibookproject.ui.profile.UserViewModel
 import com.example.ibookproject.ui.rating.RatingViewModel
+import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 
 class BookDetailsFragment : Fragment() {
 
@@ -34,7 +37,7 @@ class BookDetailsFragment : Fragment() {
     private lateinit var etComment: EditText
     private lateinit var btnPostComment: Button
     private lateinit var ivBookCover: ImageView
-    private var bookId: Int = -1
+    private var bookId: String = ""
     private lateinit var userId: String
     private var userBookRating: RatingEntity? = null
     private lateinit var btnEditBook: Button
@@ -50,9 +53,9 @@ class BookDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        bookId = arguments?.getInt("bookId") ?: -1
+        bookId = arguments?.getString("bookId") ?: ""
         userId = Utils.getUserId(requireContext()) ?: ""
-        if (bookId == -1 || userId == "") {
+        if (bookId == "" || userId == "") {
             findNavController().navigate(R.id.loginFragment)
             return null
         }
@@ -71,25 +74,80 @@ class BookDetailsFragment : Fragment() {
         btnEditBook = view.findViewById(R.id.btnEditBook)
         btnDeleteBook = view.findViewById(R.id.btnDeleteBook)
 
-        ratingViewModel.getAverageRating(bookId).observe(viewLifecycleOwner) { avgRating ->
-            ratingBar.rating = avgRating ?: 0f
+        resetScreen()
+
+        if (bookId == "") {
+            findNavController().popBackStack()
+            return view
         }
 
-        ratingViewModel.getUserRatingForBook(userId,bookId).observe(viewLifecycleOwner) { userRating ->
-            userRating?.let {
-                userRatingBar.rating = it.rating
-                userBookRating = it
+        bookViewModel.getBookById(bookId).observe(viewLifecycleOwner) { book ->
+            tvBookTitle.setText(book.title)
+            tvBookAuthor.setText(book.author)
+            tvBookDescription.setText(book.description)
+
+            if (book.coverImage.isNotEmpty()) {
+                Picasso.get()
+                    .load(book.coverImage)
+                    .placeholder(R.drawable.missing_book_cover)
+                    .error(R.drawable.missing_book_cover)
+                    .fit()
+                    .centerCrop()
+                    .into(ivBookCover)
+            } else {
+                Picasso.get()
+                    .load(R.drawable.missing_book_cover)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .fit()
+                    .centerCrop()
+                    .into(ivBookCover)
+            }
+
+            if (userId == book.uploadingUserId) {
+                btnEditBook.visibility = View.VISIBLE
+                btnDeleteBook.visibility = View.VISIBLE
+            } else {
+                btnEditBook.visibility = View.GONE
+                btnDeleteBook.visibility = View.GONE
             }
         }
 
-        commentViewModel.getCommentsForBook(bookId).observe(viewLifecycleOwner) { comments ->
-            val userNamesMap = mutableMapOf<String, String>()
+        ratingViewModel.getAverageRating(bookId)
 
-            comments.forEach { comment ->
-                userViewModel.getUserById(comment.userId).observe(viewLifecycleOwner) { user ->
-                    userNamesMap[comment.userId] = user?.name ?: "unknown user"
-                    tvComments.text = comments.joinToString("\n") {
-                        "${userNamesMap[it.userId] ?: "loading..."}: ${it.comment}"
+        lifecycleScope.launch {
+            ratingViewModel.AVGrating.collect() { avg ->
+                avg.let {
+                    ratingBar.rating = avg
+                }
+            }
+        }
+
+        ratingViewModel.getUserRatingForBook(userId, bookId)
+
+        lifecycleScope.launch {
+            ratingViewModel.userRating.collect() { userRating ->
+                userRating?.let {
+                    println("RATING GOT HEREEEE +$userRating")
+                    userRatingBar.rating = userRating.rating
+                    userBookRating = userRating
+                }
+            }
+        }
+
+        commentViewModel.getCommentsForBook(bookId)
+
+        lifecycleScope.launch {
+            commentViewModel.comments.collect { comments ->
+
+                val userNamesMap = mutableMapOf<String, String>()
+
+                comments.forEach { comment ->
+                    userViewModel.getUserById(comment.userId).observe(viewLifecycleOwner) { user ->
+                        userNamesMap[comment.userId] = user?.name ?: "unknown user"
+                        tvComments.text = comments.joinToString("\n") {
+                            "${userNamesMap[it.userId] ?: "loading..."}: ${it.comment}"
+                        }
                     }
                 }
             }
@@ -97,31 +155,16 @@ class BookDetailsFragment : Fragment() {
 
         setupListeners()
 
-        bookId.let { bookId ->
-            bookViewModel.getBookById(bookId).observe(viewLifecycleOwner) { book ->
-                val comments = emptyList<String>()
-
-                tvBookTitle.text = book.title
-                tvBookAuthor.text = "by ${book.author}"
-                tvBookDescription.text = "description ${book.description}"
-                ratingBar.rating = book.rating
-                tvComments.text = comments.joinToString("\n")
-
-                if (userId == book.uploadingUserId) {
-                    btnEditBook.visibility = View.VISIBLE
-                    btnDeleteBook.visibility = View.VISIBLE
-                } else {
-                    btnEditBook.visibility = View.GONE
-                    btnDeleteBook.visibility = View.GONE
-                }
-
-                Glide.with(requireContext())
-                    .load(book.coverImage)
-                    .into(ivBookCover)
-            }
-        }
-
         return view
+    }
+
+    private fun resetScreen() {
+        userBookRating = null
+        userRatingBar.rating = 0f
+        ratingBar.rating = 0f
+        tvComments.text = ""
+        etComment.text.clear()
+        ratingViewModel.resetUserRatingForBook()
     }
 
     private fun setupListeners() {
@@ -129,11 +172,10 @@ class BookDetailsFragment : Fragment() {
             val userRating = userRatingBar.rating
 
             val rating = RatingEntity(bookId = bookId, userId = userId, rating = userRating)
-            if (userBookRating != null){
+            if (userBookRating != null) {
                 rating.id = userBookRating!!.id
                 ratingViewModel.updateRating(rating)
-            }
-            else{
+            } else {
                 ratingViewModel.addRating(rating)
             }
         }
@@ -148,8 +190,11 @@ class BookDetailsFragment : Fragment() {
         }
 
         btnEditBook.setOnClickListener {
-            val bundle = Bundle().apply { putInt("bookId", bookId) }
-            findNavController().navigate(R.id.action_bookDetailsFragment_to_editBookFragment, bundle)
+            val bundle = Bundle().apply { putString("bookId", bookId) }
+            findNavController().navigate(
+                R.id.action_bookDetailsFragment_to_editBookFragment,
+                bundle
+            )
         }
 
         btnDeleteBook.setOnClickListener {
