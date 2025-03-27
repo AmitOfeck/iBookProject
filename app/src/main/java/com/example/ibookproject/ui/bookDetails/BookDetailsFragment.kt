@@ -12,10 +12,8 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.Utils
 import com.example.ibookproject.data.entities.CommentEntity
@@ -23,7 +21,7 @@ import com.example.ibookproject.data.entities.RatingEntity
 import com.example.ibookproject.ui.comment.CommentViewModel
 import com.example.ibookproject.ui.profile.UserViewModel
 import com.example.ibookproject.ui.rating.RatingViewModel
-import kotlinx.coroutines.flow.collect
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 
 class BookDetailsFragment : Fragment() {
@@ -76,6 +74,44 @@ class BookDetailsFragment : Fragment() {
         btnDeleteBook = view.findViewById(R.id.btnDeleteBook)
 
         resetScreen()
+
+        if (bookId == -1) {
+            findNavController().popBackStack()
+            return view
+        }
+
+        bookViewModel.getBookById(bookId).observe(viewLifecycleOwner) { book ->
+            tvBookTitle.setText(book.title)
+            tvBookAuthor.setText(book.author)
+            tvBookDescription.setText(book.description)
+
+            if(book.coverImage != "") {
+                Picasso.get()
+                    .load(book.coverImage)
+                    .placeholder(R.drawable.missing_book_cover)
+                    .error(R.drawable.missing_book_cover)
+                    .fit()
+                    .centerCrop()
+                    .into(ivBookCover)
+            }
+            else{
+                Picasso.get()
+                    .load(R.drawable.missing_book_cover)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .fit()
+                    .centerCrop()
+                    .into(ivBookCover)
+            }
+
+            if (userId == book.uploadingUserId) {
+                btnEditBook.visibility = View.VISIBLE
+                btnDeleteBook.visibility = View.VISIBLE
+            } else {
+                btnEditBook.visibility = View.GONE
+                btnDeleteBook.visibility = View.GONE
+            }
+        }
 
         ratingViewModel.getAverageRating(bookId)
 

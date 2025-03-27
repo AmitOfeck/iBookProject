@@ -15,11 +15,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
 import com.example.ibookproject.ui.Genres
 import com.example.ibookproject.ui.bookDetails.BookDetailsViewModel
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 
 class EditBookFragment : Fragment() {
@@ -69,9 +69,24 @@ class EditBookFragment : Fragment() {
             etDescription.setText(book.description)
             imageUri = Uri.parse(book.coverImage)
 
-            Glide.with(requireContext())
-                .load(book.coverImage)
-                .into(coverImage)
+            if(book.coverImage != "") {
+                Picasso.get()
+                    .load(book.coverImage)
+                    .placeholder(R.drawable.missing_book_cover)
+                    .error(R.drawable.missing_book_cover)
+                    .fit()
+                    .centerCrop()
+                    .into(coverImage)
+            }
+            else{
+                Picasso.get()
+                    .load(R.drawable.missing_book_cover)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .fit()
+                    .centerCrop()
+                    .into(coverImage)
+            }
 
             // קביעת הז'אנר הנבחר
             val position = Genres.getAll().indexOf(book.genre)

@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.ibookproject.R
 import com.example.ibookproject.data.entities.BookEntity
+import com.squareup.picasso.Picasso
 
 class BooksAdapter(private var books: List<BookEntity>, private val onBookClick: (Int) -> Unit) :
     RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
@@ -35,10 +35,24 @@ class BooksAdapter(private var books: List<BookEntity>, private val onBookClick:
             tvBookAuthor.text = "by ${book.author}"
             tvBookGenre.text = "Genre: ${book.genre}"
 
-            // טעינת תמונה עם Glide
-            Glide.with(itemView.context)
-                .load(book.coverImage)
-                .into(ivBookCover)
+            if(book.coverImage != "") {
+                Picasso.get()
+                    .load(book.coverImage)
+                    .placeholder(R.drawable.missing_book_cover)
+                    .error(R.drawable.missing_book_cover)
+                    .fit()
+                    .centerCrop()
+                    .into(ivBookCover)
+            }
+            else{
+                Picasso.get()
+                    .load(R.drawable.missing_book_cover)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .fit()
+                    .centerCrop()
+                    .into(ivBookCover)
+            }
 
             itemView.setOnClickListener {
                 onBookClick(book.id)  // 🔹 קריאה ל-Callback עם ה-ID של הספר

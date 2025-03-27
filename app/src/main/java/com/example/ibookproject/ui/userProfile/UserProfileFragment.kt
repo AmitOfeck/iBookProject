@@ -87,8 +87,6 @@ class UserProfileFragment : Fragment() {
                 tvUsername.text = user.name
                 tvUserBio.text = user.bio
 
-                Log.d("UserProfileFragment", "Profile Image URI: ${user.profileImage}")
-
                 Picasso.get()
                     .load(user.profileImage)
                     .placeholder(R.drawable.ic_profile)
