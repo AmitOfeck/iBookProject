@@ -33,6 +33,7 @@ class RatingViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             ratingRepository.addRating(rating)
             getAverageRating(rating.bookId)
+            _userRating.value = rating
         }
     }
 
@@ -41,12 +42,19 @@ class RatingViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             ratingRepository.updateRating(rating)
             getAverageRating(rating.bookId)
+            _userRating.value = rating
         }
     }
 
      fun getUserRatingForBook(userId:String, bookId: String) {
         viewModelScope.launch {
             _userRating.value = ratingRepository.getUserRatingForBook(userId, bookId)
+        }
+    }
+
+    fun resetUserRatingForBook() {
+        viewModelScope.launch {
+            _userRating.value = null
         }
     }
 

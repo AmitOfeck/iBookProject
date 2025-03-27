@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.ibookproject.R
 import com.example.ibookproject.Utils
+import com.example.ibookproject.data.dao.RatingDao
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.data.entities.RatingEntity
 import com.example.ibookproject.ui.comment.CommentViewModel
@@ -85,7 +86,7 @@ class BookDetailsFragment : Fragment() {
             tvBookAuthor.setText(book.author)
             tvBookDescription.setText(book.description)
 
-            if(!book.coverImage.isNullOrEmpty()) {
+            if (book.coverImage.isNotEmpty()) {
                 Picasso.get()
                     .load(book.coverImage)
                     .placeholder(R.drawable.missing_book_cover)
@@ -93,8 +94,7 @@ class BookDetailsFragment : Fragment() {
                     .fit()
                     .centerCrop()
                     .into(ivBookCover)
-            }
-            else{
+            } else {
                 Picasso.get()
                     .load(R.drawable.missing_book_cover)
                     .placeholder(R.drawable.ic_profile)
@@ -117,7 +117,7 @@ class BookDetailsFragment : Fragment() {
 
         lifecycleScope.launch {
             ratingViewModel.AVGrating.collect() { avg ->
-                avg?.let {
+                avg.let {
                     ratingBar.rating = avg
                 }
             }
@@ -128,6 +128,7 @@ class BookDetailsFragment : Fragment() {
         lifecycleScope.launch {
             ratingViewModel.userRating.collect() { userRating ->
                 userRating?.let {
+                    println("RATING GOT HEREEEE +$userRating")
                     userRatingBar.rating = userRating.rating
                     userBookRating = userRating
                 }
@@ -158,11 +159,12 @@ class BookDetailsFragment : Fragment() {
     }
 
     private fun resetScreen() {
+        userBookRating = null
         userRatingBar.rating = 0f
         ratingBar.rating = 0f
         tvComments.text = ""
         etComment.text.clear()
-        userBookRating = null
+        ratingViewModel.resetUserRatingForBook()
     }
 
     private fun setupListeners() {
@@ -189,7 +191,10 @@ class BookDetailsFragment : Fragment() {
 
         btnEditBook.setOnClickListener {
             val bundle = Bundle().apply { putString("bookId", bookId) }
-            findNavController().navigate(R.id.action_bookDetailsFragment_to_editBookFragment, bundle)
+            findNavController().navigate(
+                R.id.action_bookDetailsFragment_to_editBookFragment,
+                bundle
+            )
         }
 
         btnDeleteBook.setOnClickListener {
