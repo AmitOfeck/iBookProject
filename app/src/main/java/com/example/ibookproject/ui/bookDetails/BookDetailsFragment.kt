@@ -12,11 +12,12 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.ibookproject.R
 import com.example.ibookproject.Utils
-import com.example.ibookproject.data.dao.RatingDao
 import com.example.ibookproject.data.entities.CommentEntity
 import com.example.ibookproject.data.entities.RatingEntity
 import com.example.ibookproject.ui.comment.CommentViewModel
@@ -116,37 +117,43 @@ class BookDetailsFragment : Fragment() {
 
         ratingViewModel.getAverageRating(bookId)
 
-        lifecycleScope.launch {
-            ratingViewModel.AVGrating.collect() { avg ->
-                avg.let {
-                    ratingBar.rating = avg
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                ratingViewModel.AVGrating.collect { avg ->
+                    avg.let {
+                        ratingBar.rating = avg
+                    }
                 }
             }
         }
 
         ratingViewModel.getUserRatingForBook(userId, bookId)
 
-        lifecycleScope.launch {
-            ratingViewModel.userRating.collect() { userRating ->
-                userRating?.let {
-                    userRatingBar.rating = userRating.rating
-                    userBookRating = userRating
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                ratingViewModel.userRating.collect { userRating ->
+                    userRating?.let {
+                        userRatingBar.rating = userRating.rating
+                        userBookRating = userRating
+                    }
                 }
             }
         }
 
         commentViewModel.getCommentsForBook(bookId)
 
-        lifecycleScope.launch {
-            commentViewModel.comments.collect { comments ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                commentViewModel.comments.collect { comments ->
 
-                val userNamesMap = mutableMapOf<String, String>()
+                    val userNamesMap = mutableMapOf<String, String>()
 
-                comments.forEach { comment ->
-                    userViewModel.getUserById(comment.userId).observe(viewLifecycleOwner) { user ->
-                        userNamesMap[comment.userId] = user?.name ?: "unknown user"
-                        tvComments.text = comments.joinToString("\n") {
-                            "${userNamesMap[it.userId] ?: "loading..."}: ${it.comment}"
+                    comments.forEach { comment ->
+                        userViewModel.getUserById(comment.userId).observe(viewLifecycleOwner) { user ->
+                            userNamesMap[comment.userId] = user?.name ?: "unknown user"
+                            tvComments.text = comments.joinToString("\n") {
+                                "${userNamesMap[it.userId] ?: "loading..."}: ${it.comment}"
+                            }
                         }
                     }
                 }
